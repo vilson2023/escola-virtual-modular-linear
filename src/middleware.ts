@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server';
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
-  const isOnDashboard = req.nextUrl.pathname.startsWith('/dashboard');
-  const isOnAuthPage =
-    req.nextUrl.pathname.startsWith('/login') ||
-    req.nextUrl.pathname.startsWith('/register');
+  const path = req.nextUrl.pathname;
 
-  if (isOnDashboard && !isLoggedIn) {
+  const isOnDashboard = path.startsWith('/dashboard');
+  const isOnAdmin = path.startsWith('/admin');
+  const isOnAuthPage = path.startsWith('/login') || path.startsWith('/register');
+
+  if ((isOnDashboard || isOnAdmin) && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 

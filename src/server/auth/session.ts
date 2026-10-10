@@ -11,3 +11,9 @@ export async function requireAuth() {
   if (!user) redirect('/login');
   return user;
 }
+
+export async function requireRole(role: string) {
+  const user = await requireAuth();
+  if (user.role !== role) redirect('/dashboard');
+  return user;
+}
