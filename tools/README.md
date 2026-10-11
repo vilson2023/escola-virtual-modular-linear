@@ -108,6 +108,25 @@ Gera um arquivo `env-report.txt` na raiz do projeto com o diagnóstico completo 
 
 **Uso:** duplo clique, depois abra o `env-report.txt` e cole o conteúdo no chat do engenheiro. O arquivo é ignorado pelo Git (está no `.gitignore`).
 
+### strip-asaas-key.bat
+
+Normaliza a `ASAAS_API_KEY` no `.env` para o formato recomendado (sem `$` nem `\`).
+
+**Quando usar:**
+- Se a `ASAAS_API_KEY` no seu `.env` tem `$` ou `\$` no início e o Asaas retorna 401
+- Se você está migrando de uma versão antiga do projeto para a nova (que usa o formato sem `$`)
+
+**O que faz:**
+1. Faz backup do `.env` como `.env.bak`
+2. Remove `\$` e `$` do início da chave
+3. Reescreve o `.env` com a chave normalizada
+
+**Fluxo completo quando a chave está com problema:**
+1. `strip-asaas-key.bat` — normaliza o `.env`
+2. `fix-env.bat` — copia para o `.env.local`
+3. `sync-and-run.bat` — reinicia o servidor
+4. `diagnose-asaas.bat` — confirma que retorna HTTP 200
+
 ## fresh-start.bat — versão de emergência
 
 Use **só quando algo der errado**: erro estranho de dependência, projeto não inicia, coisa que não resolve com o script normal.

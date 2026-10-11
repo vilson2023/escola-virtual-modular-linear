@@ -34,6 +34,7 @@ yarn-error.log*
 .env
 .env*.local
 .env.local.bak
+.env.bak
 env-report.txt
 
 # vercel
