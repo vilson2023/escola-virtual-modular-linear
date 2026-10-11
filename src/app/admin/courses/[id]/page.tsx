@@ -80,7 +80,14 @@ export default async function CourseHubPage({
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-lg font-semibold text-slate-900">{module.title}</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    <Link
+                      href={`/admin/courses/${id}/modules/${module.id}`}
+                      className="hover:text-brand-700"
+                    >
+                      {module.title}
+                    </Link>
+                  </h3>
                   {module.presentationVideoUrl && (
                     <Badge variant="neutral">Tem vídeo de apresentação</Badge>
                   )}
@@ -89,7 +96,14 @@ export default async function CourseHubPage({
                   <p className="mt-1 truncate text-sm text-slate-500">{module.description}</p>
                 )}
                 <p className="mt-1 text-sm text-slate-500">
-                  {module._count.lessons} aulas · {brl.format(module.priceCents / 100)}
+                  <Link
+                    href={`/admin/courses/${id}/modules/${module.id}`}
+                    className="hover:text-brand-700 hover:underline"
+                  >
+                    {module._count.lessons} aulas
+                  </Link>
+                  {' · '}
+                  {brl.format(module.priceCents / 100)}
                 </p>
               </div>
 
