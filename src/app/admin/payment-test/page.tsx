@@ -1,5 +1,6 @@
 import { requireRole } from '@/server/auth/session';
 import { AsaasTestPanel } from './AsaasTestPanel';
+import { EnvDiagnosticPanel } from './EnvDiagnosticPanel';
 
 export default async function PaymentTestPage() {
   await requireRole('ADMIN');
@@ -19,7 +20,8 @@ export default async function PaymentTestPage() {
       <p className="mt-1 text-sm text-slate-500">
         Cria um cliente de teste no Asaas Sandbox para validar a conexão. [DEV]
       </p>
-      <div className="mt-6">
+      <div className="mt-6 space-y-6">
+        <EnvDiagnosticPanel />
         <AsaasTestPanel />
       </div>
     </div>
