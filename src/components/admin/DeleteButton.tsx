@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
+import { Button } from '@/components/ui/Button';
 
 type Props = {
   onDelete: () => Promise<void>;
@@ -19,13 +20,14 @@ export function DeleteButton({ onDelete, confirmMessage, label = 'Excluir' }: Pr
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="danger"
+      size="sm"
       onClick={handleClick}
       disabled={pending}
-      className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
     >
       {pending ? 'Excluindo...' : label}
-    </button>
+    </Button>
   );
 }
