@@ -10,6 +10,7 @@ Plataforma de ensino à distância (LMS) com jornada **estritamente linear** e g
 - **Tailwind CSS v4** (via PostCSS)
 - **Prisma ORM 6** + PostgreSQL (Neon)
 - **Auth.js v5** (NextAuth) — Credentials Provider + JWT
+- **Asaas** (sandbox) para pagamentos — PIX, boleto e cartão
 - **bcryptjs** para hash de senha
 - **Zod** para validação
 
@@ -25,9 +26,10 @@ cd escola-virtual-modular-linear
 ```
 
 2. Crie os arquivos `.env` e `.env.local` (peça ao Kimi o conteúdo com `DATABASE_URL`, `AUTH_SECRET` e `AUTH_URL`).
-3. Rode `npm install`.
-4. Rode `npx prisma generate` e `npm run db:seed`.
-5. Rode `npm run dev`.
+3. Para testar pagamentos, configure também `ASAAS_API_KEY` e `ASAAS_API_URL` (sandbox — ver `.env.example`).
+4. Rode `npm install`.
+5. Rode `npx prisma generate` e `npm run db:seed`.
+6. Rode `npm run dev`.
 
 ### Uso diário (Windows)
 

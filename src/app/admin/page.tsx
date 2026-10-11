@@ -31,10 +31,15 @@ export default async function AdminPage() {
         ))}
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 flex flex-wrap gap-3">
         <Button href="/admin/courses" variant="primary">
           Gerenciar Cursos →
         </Button>
+        {process.env.NODE_ENV !== 'production' && (
+          <Button href="/admin/payment-test" variant="secondary">
+            Testar Asaas (dev)
+          </Button>
+        )}
       </div>
     </div>
   );
