@@ -2,6 +2,12 @@
 
 Scripts para o Vilson rodar o projeto dumo sem precisar digitar comandos.
 
+## Ordem recomendada quando você puxa código novo do GitHub
+
+1. `sync-and-run.bat` — sincroniza tudo e inicia o servidor
+2. (se o `sync-and-run` reclamar de env) `check-env.bat` — diagnostica problemas
+3. (se precisar ajustar env) edite o `.env`, depois `fix-env.bat` para sincronizar
+
 ## sync-and-run.bat — uso diário
 
 É o script principal. Faça o seguinte:
@@ -48,6 +54,30 @@ Verifica se os arquivos `.env` e `.env.local` estão configurados corretamente.
 ```
 
 **Nota:** se o formato do `.env` mudar (ex.: aspas simples em vez de aspas duplas), o `check-env.bat` pode precisar de ajuste, porque ele detecta o escape procurando a sequência `\$aact_` na linha da `ASAAS_API_KEY`.
+
+### fix-env.bat
+
+Sincroniza o `.env.local` com o `.env`, fazendo backup do antigo.
+
+**Quando usar:**
+- Depois de editar o `.env` (ex.: adicionar uma variável nova)
+- Se o `check-env.bat` reclamar que `.env.local` está diferente do `.env`
+- Se você não tem certeza se os dois arquivos estão iguais
+
+**O que faz:**
+1. Faz backup do `.env.local` atual como `.env.local.bak`
+2. Copia o `.env` por cima do `.env.local`
+3. Mostra o conteúdo final na tela
+
+**Restaurar o backup (se precisar):**
+```bat
+copy /Y .env.local.bak .env.local
+```
+
+**Fluxo recomendado quando o Kimi adicionar uma variável nova:**
+1. Você edita o `.env` (adiciona a variável)
+2. Duplo clique em `fix-env.bat` → `.env.local` fica igual
+3. Duplo clique em `sync-and-run.bat` → servidor reinicia
 
 ## fresh-start.bat — versão de emergência
 
