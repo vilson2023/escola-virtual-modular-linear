@@ -79,6 +79,37 @@ copy /Y .env.local.bak .env.local
 2. Duplo clique em `fix-env.bat` → `.env.local` fica igual
 3. Duplo clique em `sync-and-run.bat` → servidor reinicia
 
+### Problema de quebra de linha (LF vs CRLF)
+
+O Bloco de Notas do Windows às vezes salva arquivos com quebra de linha Unix (LF), e isso quebra os scripts `.bat` que usam `for /f` para ler os `.env`.
+
+**Como identificar:** abra o arquivo no Bloco de Notas e olhe o rodapé da janela. Se diz **"Unix (LF)"** em vez de **"Windows (CRLF)"**, o arquivo está em LF.
+
+**Solução:** rode `convert-env-to-crlf.bat` (seção abaixo) para converter `.env` e `.env.local` para CRLF.
+
+**Por que isso importa:** o `for /f` do cmd só lê corretamente arquivos com CRLF. Com LF, os scripts falham com mensagens como "não encontrei ASAAS_API_KEY" mesmo com a linha presente no arquivo. Os scripts novos leem as variáveis via PowerShell (que lê LF sem problema), mas converter os arquivos deixa tudo consistente com o padrão do Windows.
+
+Após rodar a conversão, os scripts voltam a funcionar normalmente.
+
+### convert-env-to-crlf.bat
+
+Converte `.env` e `.env.local` para o formato Windows (CRLF) + UTF-8 sem BOM.
+
+**Quando usar:**
+- Se o rodapé do Bloco de Notas mostrar "Unix (LF)" nos seus `.env`
+- Se algum script falhar dizendo que não encontrou uma variável que existe no arquivo
+
+**O que faz:**
+1. Detecta se cada arquivo está em LF ou CRLF
+2. Faz backup dos originais como `.env.lfbak` e `.env.local.lfbak`
+3. Regrava os arquivos em CRLF + UTF-8 sem BOM
+
+**Restaurar o backup (se precisar):**
+```bat
+copy /Y .env.lfbak .env
+copy /Y .env.local.lfbak .env.local
+```
+
 ### Sobre a chave do Asaas e o `$`
 
 A chave do Asaas começa com `$` (ex.: `$aact_hmlg_...`). O Next.js usa `dotenv-expand`, que interpreta `$` como variável — e isso pode zerar a env.

@@ -1,5 +1,4 @@
 @echo off
-setlocal EnableDelayedExpansion
 chcp 65001 >nul
 title dumo - normalizar chave do Asaas no .env
 cd /d "%~dp0\.."
@@ -11,74 +10,48 @@ echo ================================================
 echo.
 
 if not exist ".env" (
-  echo [X] Arquivo .env nao encontrado na raiz do projeto.
+  echo [X] Arquivo .env nao encontrado.
   pause
   exit /b 1
 )
 
-echo [1/4] Fazendo backup do .env como .env.bak...
+echo [1/3] Fazendo backup do .env como .env.bak...
 if exist ".env.bak" del /q ".env.bak" >nul 2>&1
 copy /Y ".env" ".env.bak" >nul
-echo      Backup: .env.bak
-echo.
-
-echo [2/4] Lendo ASAAS_API_KEY atual...
-set "OLD_KEY="
-for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
-  if "%%a"=="ASAAS_API_KEY" set "OLD_KEY=%%b"
-)
-
-if "!OLD_KEY!"=="" (
-  echo [X] Nao encontrei a linha ASAAS_API_KEY no .env.
-  pause
-  exit /b 1
-)
-
-:: Remove aspas
-set "OLD_KEY=!OLD_KEY:"=!"
-:: Remove barra invertida de escape
-set "OLD_KEY=!OLD_KEY:\$=$!"
-:: Remove $ inicial
-if "!OLD_KEY:~0,1!"=="$" set "OLD_KEY=!OLD_KEY:~1!"
-
-echo      Chave normalizada: !OLD_KEY:~0,15!...  ^(comprimento: leia abaixo^)
-echo.
-
-echo [3/4] Reescrevendo .env...
-:: Cria .env.new sem a linha antiga, depois adiciona a nova
-set "FOUND="
-type nul > ".env.new"
-for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
-  if "%%a"=="ASAAS_API_KEY" (
-    echo ASAAS_API_KEY="!OLD_KEY!">> ".env.new"
-    set "FOUND=1"
-  ) else (
-    if "%%b"=="" (
-      echo %%a>> ".env.new"
-    ) else (
-      echo %%a=%%b>> ".env.new"
-    )
-  )
-)
-
-:: Se nao achou a linha (nao deveria acontecer), adiciona ao final
-if "!FOUND!"=="" (
-  echo ASAAS_API_KEY="!OLD_KEY!">> ".env.new"
-)
-
-:: Substitui .env pelo .env.new
-move /Y ".env.new" ".env" >nul
-
 echo      OK
 echo.
 
-echo [4/4] Verificando novo conteudo (primeiros 15 chars):
-for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
-  if "%%a"=="ASAAS_API_KEY" (
-    set "NEW_KEY=%%b"
-    set "NEW_KEY=!NEW_KEY:"=!"
-    echo      ASAAS_API_KEY="!NEW_KEY:~0,15!..."  ^(sem $ nem \^)
-  )
+echo [2/3] Normalizando ASAAS_API_KEY via PowerShell...
+:: O caractere de aspa dupla e montado com [char]34 para nao
+:: precisar de aspas dentro do comando (que quebram o cmd)
+powershell -Command ^
+  "$path = '.env';" ^
+  "$raw = Get-Content -Raw -Encoding UTF8 $path -ErrorAction Stop;" ^
+  "$has = $raw -match 'ASAAS_API_KEY=';" ^
+  "if (-not $has) { Write-Host '[X] Nao encontrei ASAAS_API_KEY no .env'; exit 1 };" ^
+  "$q = [char]34;" ^
+  "$raw = $raw -replace ('ASAAS_API_KEY=' + $q + '\\\$'), ('ASAAS_API_KEY=' + $q);" ^
+  "$raw = $raw -replace ('ASAAS_API_KEY=' + $q + '\$'), ('ASAAS_API_KEY=' + $q);" ^
+  "$utf8 = New-Object System.Text.UTF8Encoding $false;" ^
+  "[System.IO.File]::WriteAllText((Resolve-Path $path), $raw, $utf8);" ^
+  "Write-Host '      OK'"
+
+if errorlevel 1 (
+  echo.
+  echo [X] Erro ao normalizar. Restaure o backup: copy /Y .env.bak .env
+  pause
+  exit /b 1
+)
+echo.
+
+echo [3/3] Verificando resultado...
+powershell -Command "$c = Get-Content '.env' | Where-Object { $_ -match '^ASAAS_API_KEY=' }; if ($c) { $v = $c -replace '^ASAAS_API_KEY='; $v = $v.Trim([char]34).Trim(); Write-Output $v }" > "%TEMP%\dumo-newkey.txt" 2>nul
+set "NEW_KEY="
+if exist "%TEMP%\dumo-newkey.txt" set /p NEW_KEY=<"%TEMP%\dumo-newkey.txt"
+del /q "%TEMP%\dumo-newkey.txt" >nul 2>&1
+
+if not "%NEW_KEY%"=="" (
+  powershell -Command "$k = '%NEW_KEY%'; Write-Host ('      ASAAS_API_KEY=' + [char]34 + $k.Substring(0, [Math]::Min(15, $k.Length)) + '...' + [char]34 + '  (length=' + $k.Length + ')')"
 )
 echo.
 
@@ -86,8 +59,7 @@ echo ----------------------------------------------
 echo  Pronto! Agora rode fix-env.bat para copiar
 echo  o .env normalizado para o .env.local.
 echo.
-echo  Restaurar o backup (se precisar):
-echo    copy /Y .env.bak .env
+echo  Restaurar backup: copy /Y .env.bak .env
 echo ----------------------------------------------
 echo.
 pause
