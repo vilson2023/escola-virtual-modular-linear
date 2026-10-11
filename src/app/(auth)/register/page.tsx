@@ -4,6 +4,11 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Logo } from '@/components/ui/Logo';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -54,54 +59,51 @@ export default function RegisterPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-900">Criar conta</h1>
-      <p className="mt-1 text-sm text-slate-500">Cadastre-se para acessar a plataforma</p>
+    <Card className="w-full max-w-md">
+      <div className="mb-6 text-center">
+        <Logo href="/" />
+      </div>
+
+      <h1 className="text-2xl font-bold text-slate-900">Comece sua jornada</h1>
+      <p className="mt-1 text-sm text-slate-500">
+        Crie sua conta gratuita e comece hoje.
+      </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label htmlFor="name" className="mb-1 block text-sm font-medium text-slate-700">
-            Nome
-          </label>
-          <input
+          <Label htmlFor="name">Nome</Label>
+          <Input
             id="name"
             type="text"
             required
+            placeholder="Seu nome completo"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="Seu nome completo"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">
-            E-mail
-          </label>
-          <input
+          <Label htmlFor="email">E-mail</Label>
+          <Input
             id="email"
             type="email"
             required
+            placeholder="voce@exemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="voce@exemplo.com"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-slate-700">
-            Senha
-          </label>
-          <input
+          <Label htmlFor="password">Senha</Label>
+          <Input
             id="password"
             type="password"
             required
             minLength={6}
+            placeholder="Mínimo de 6 caracteres"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="Mínimo de 6 caracteres"
           />
         </div>
 
@@ -109,21 +111,17 @@ export default function RegisterPage() {
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:opacity-50"
-        >
+        <Button type="submit" variant="primary" className="w-full" disabled={loading}>
           {loading ? 'Cadastrando...' : 'Criar conta'}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-500">
         Já tem conta?{' '}
-        <Link href="/login" className="font-semibold text-slate-900 underline">
+        <Link href="/login" className="font-semibold text-brand-600 hover:text-brand-700">
           Entrar
         </Link>
       </p>
-    </div>
+    </Card>
   );
 }

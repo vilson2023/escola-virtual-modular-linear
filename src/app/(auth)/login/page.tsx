@@ -4,6 +4,11 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Logo } from '@/components/ui/Logo';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,38 +44,36 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-900">Entrar</h1>
-      <p className="mt-1 text-sm text-slate-500">Acesse sua conta na plataforma</p>
+    <Card className="w-full max-w-md">
+      <div className="mb-6 text-center">
+        <Logo href="/" />
+      </div>
+
+      <h1 className="text-2xl font-bold text-slate-900">Bem-vindo de volta</h1>
+      <p className="mt-1 text-sm text-slate-500">Entre para continuar sua jornada.</p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">
-            E-mail
-          </label>
-          <input
+          <Label htmlFor="email">E-mail</Label>
+          <Input
             id="email"
             type="email"
             required
+            placeholder="voce@exemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="voce@exemplo.com"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-slate-700">
-            Senha
-          </label>
-          <input
+          <Label htmlFor="password">Senha</Label>
+          <Input
             id="password"
             type="password"
             required
+            placeholder="Sua senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="Sua senha"
           />
         </div>
 
@@ -78,21 +81,17 @@ export default function LoginPage() {
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:opacity-50"
-        >
+        <Button type="submit" variant="primary" className="w-full" disabled={loading}>
           {loading ? 'Entrando...' : 'Entrar'}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-500">
-        Não tem conta?{' '}
-        <Link href="/register" className="font-semibold text-slate-900 underline">
+        Ainda não tem conta?{' '}
+        <Link href="/register" className="font-semibold text-brand-600 hover:text-brand-700">
           Criar conta
         </Link>
       </p>
-    </div>
+    </Card>
   );
 }
