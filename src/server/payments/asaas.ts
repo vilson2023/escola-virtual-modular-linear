@@ -4,6 +4,7 @@ import type {
   Customer,
   CreatePaymentInput,
   Payment,
+  PixQrCode,
 } from './types';
 
 const BASE_URL = process.env.ASAAS_API_URL ?? 'https://api-sandbox.asaas.com/v3';
@@ -67,6 +68,8 @@ export const asaasProvider: PaymentProvider = {
         dueDate: input.dueDate,
         description: input.description,
         externalReference: input.externalReference,
+        creditCard: input.creditCard,
+        creditCardHolderInfo: input.creditCardHolderInfo,
       }),
     });
     return {
@@ -99,5 +102,14 @@ export const asaasProvider: PaymentProvider = {
       invoiceUrl: data.invoiceUrl,
       dueDate: data.dueDate,
     };
+  },
+
+  async getPixQrCode(paymentId: string): Promise<PixQrCode> {
+    const data = await request<{
+      encodedImage: string;
+      payload: string;
+      expirationDate: string;
+    }>(`/payments/${paymentId}/pixQrCode`);
+    return data;
   },
 };

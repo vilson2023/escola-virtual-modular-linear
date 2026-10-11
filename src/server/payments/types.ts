@@ -18,6 +18,22 @@ export type CreatePaymentInput = {
   dueDate: string; // formato YYYY-MM-DD
   description: string;
   externalReference?: string;
+  // usado apenas quando billingType = 'CREDIT_CARD'
+  creditCard?: {
+    holderName: string;
+    number: string;
+    expiryMonth: string;
+    expiryYear: string;
+    ccv: string;
+  };
+  creditCardHolderInfo?: {
+    name: string;
+    email: string;
+    cpfCnpj: string;
+    phone?: string; // com DDD, só dígitos
+    postalCode?: string; // só dígitos
+    addressNumber?: string;
+  };
 };
 
 export type Payment = {
@@ -30,8 +46,15 @@ export type Payment = {
   dueDate: string;
 };
 
+export type PixQrCode = {
+  encodedImage: string; // base64 da imagem
+  payload: string; // código copia-e-cola
+  expirationDate: string;
+};
+
 export interface PaymentProvider {
   createCustomer(input: CreateCustomerInput): Promise<Customer>;
   createPayment(input: CreatePaymentInput): Promise<Payment>;
   getPayment(id: string): Promise<Payment>;
+  getPixQrCode(paymentId: string): Promise<PixQrCode>;
 }

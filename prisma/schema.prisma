@@ -46,6 +46,7 @@ model User {
   passwordHash String
   role         UserRole   @default(STUDENT)
   status       UserStatus @default(ACTIVE)
+  asaasCustomerId String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
@@ -131,6 +132,8 @@ model StudentPurchase {
   statusPayment  PaymentStatus @default(PENDING)
   paymentToken   String?       // token do gateway (para one-click buy futuro)
   externalId     String?       // id da transação no gateway
+  invoiceUrl     String?
+  paymentMethod  String?       // 'PIX' | 'BOLETO' | 'CREDIT_CARD'
   purchasedAt    DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt

@@ -116,18 +116,28 @@ export default async function CourseViewPage({
                     {brl.format(module.priceCents / 100)}
                   </p>
 
-                  <form
-                    action={simulatePurchaseAction.bind(null, module.id)}
-                    className="mt-4"
-                  >
-                    <Button type="submit" variant="primary" size="lg">
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <Button
+                      href={`/courses/${courseId}/checkout/${module.id}`}
+                      variant="primary"
+                      size="lg"
+                    >
                       Quero desbloquear por {brl.format(module.priceCents / 100)}
                     </Button>
-                  </form>
+                    {process.env.NODE_ENV !== 'production' && (
+                      <form action={simulatePurchaseAction.bind(null, module.id)}>
+                        <Button type="submit" variant="ghost" size="sm">
+                          [DEV] Simular compra
+                        </Button>
+                      </form>
+                    )}
+                  </div>
 
-                  <p className="mt-3 text-xs text-slate-400">
-                    [DEV] Pagamento simulado — gateway real em breve.
-                  </p>
+                  {process.env.NODE_ENV !== 'production' && (
+                    <p className="mt-3 text-xs text-slate-400">
+                      [DEV] Botão "Simular compra" ignora o gateway.
+                    </p>
+                  )}
 
                   <ul className="mt-6 space-y-2">
                     {(lessonsByModule.get(module.id) ?? []).map((lesson, i) => (
