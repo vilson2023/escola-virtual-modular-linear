@@ -6,6 +6,7 @@ import { canAccessModule } from '@/server/services/module-state';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
+import { LessonActions } from '@/components/student/LessonActions';
 
 export default async function StudentLessonPage({
   params,
@@ -43,6 +44,20 @@ export default async function StudentLessonPage({
 
   const lessonBasePath = `/courses/${courseId}/modules/${moduleId}/lessons`;
 
+  // Progresso do módulo para este aluno
+  const [progress, completedCount] = await Promise.all([
+    prisma.studentProgress.findUnique({
+      where: { userId_lessonId: { userId: user.id, lessonId } },
+    }),
+    prisma.studentProgress.count({
+      where: { userId: user.id, completed: true, lesson: { moduleId } },
+    }),
+  ]);
+  const totalLessons = lessons.length;
+  const percent =
+    totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
+  const moduleComplete = totalLessons > 0 && percent === 100;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Container className="py-10">
@@ -62,7 +77,19 @@ export default async function StudentLessonPage({
           <span className="font-medium text-slate-900">{lesson.title}</span>
         </nav>
 
-        <h1 className="mt-4 text-3xl font-bold text-slate-900">{lesson.title}</h1>
+        <div className="mt-4">
+          <p className="text-sm text-slate-500">
+            {completedCount} de {totalLessons} aulas concluídas ({percent}%)
+          </p>
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+            <div
+              className="h-full rounded-full bg-brand-600 transition-all"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+        </div>
+
+        <h1 className="mt-6 text-3xl font-bold text-slate-900">{lesson.title}</h1>
 
         <div className="mt-8">
           {lesson.contentType === 'VIDEO' && lesson.videoUrl && (
@@ -103,11 +130,11 @@ export default async function StudentLessonPage({
           )}
         </div>
 
-        <div className="mt-8 flex items-center justify-between gap-4">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
           {previousLesson ? (
             <Button
               href={`${lessonBasePath}/${previousLesson.id}`}
-              variant="secondary"
+              variant="ghost"
               size="sm"
             >
               ← Aula anterior
@@ -115,12 +142,34 @@ export default async function StudentLessonPage({
           ) : (
             <span />
           )}
-          {nextLesson && (
-            <Button href={`${lessonBasePath}/${nextLesson.id}`} variant="primary" size="sm">
-              Próxima aula →
-            </Button>
-          )}
+          <Button href={`/courses/${courseId}/modules/${moduleId}`} variant="ghost" size="sm">
+            Voltar ao módulo
+          </Button>
         </div>
+
+        <div className="mt-6">
+          <LessonActions
+            lessonId={lesson.id}
+            initialCompleted={progress?.completed ?? false}
+            nextLessonHref={nextLesson ? `${lessonBasePath}/${nextLesson.id}` : undefined}
+          />
+        </div>
+
+        {moduleComplete && (
+          <Card className="mt-8 border-brand-200 bg-brand-50 text-center">
+            <p className="text-2xl font-bold text-slate-900">
+              🎉 Você concluiu este módulo!
+            </p>
+            <p className="mt-2 text-sm text-slate-600">
+              O próximo módulo já está disponível na vitrine.
+            </p>
+            <div className="mt-4">
+              <Button href={`/courses/${courseId}`} variant="primary">
+                Ver próximo módulo
+              </Button>
+            </div>
+          </Card>
+        )}
       </Container>
     </div>
   );

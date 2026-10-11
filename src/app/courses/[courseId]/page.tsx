@@ -67,6 +67,9 @@ export default async function CourseViewPage({
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-xl font-semibold text-slate-900">{module.title}</h2>
                     <Badge variant="success">Liberado</Badge>
+                    {module.progressPercent === 100 && (
+                      <Badge variant="brand">✓ Concluído</Badge>
+                    )}
                   </div>
                   {module.description && (
                     <p className="mt-1 text-sm text-slate-500">{module.description}</p>

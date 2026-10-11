@@ -34,6 +34,18 @@ export default async function StudentModulePage({
   });
   if (!module || module.courseId !== courseId) notFound();
 
+  const completedLessons = await prisma.studentProgress.findMany({
+    where: { userId: user.id, completed: true, lesson: { moduleId } },
+    select: { lessonId: true },
+  });
+  const completedSet = new Set(completedLessons.map((p) => p.lessonId));
+
+  const totalLessons = module.lessons.length;
+  const completedCount = completedSet.size;
+  const percent =
+    totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
+  const moduleComplete = totalLessons > 0 && percent === 100;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Container className="py-10">
@@ -54,7 +66,30 @@ export default async function StudentModulePage({
           {module.description && (
             <p className="mt-2 text-slate-500">{module.description}</p>
           )}
+          <p className="mt-4 text-sm text-slate-500">
+            {completedCount} de {totalLessons} aulas concluídas ({percent}%)
+          </p>
+          <div className="mt-2 h-1.5 w-full max-w-md overflow-hidden rounded-full bg-slate-200">
+            <div
+              className="h-full rounded-full bg-brand-600 transition-all"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
         </div>
+
+        {moduleComplete && (
+          <Card className="mt-6 border-brand-200 bg-brand-50 text-center">
+            <p className="text-xl font-bold text-slate-900">🎉 Módulo concluído!</p>
+            <p className="mt-2 text-sm text-slate-600">
+              Volte para o curso para ver o próximo módulo na vitrine.
+            </p>
+            <div className="mt-4">
+              <Button href={`/courses/${courseId}`} variant="primary" size="sm">
+                Ver próximo módulo
+              </Button>
+            </div>
+          </Card>
+        )}
 
         <div className="mt-8 space-y-4">
           {module.lessons.length === 0 ? (
@@ -64,14 +99,28 @@ export default async function StudentModulePage({
           ) : (
             module.lessons.map((lesson) => {
               const typeBadge = contentTypeBadge[lesson.contentType];
+              const completed = completedSet.has(lesson.id);
               return (
                 <Card key={lesson.id} className="flex items-center gap-6">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-600 font-bold text-white">
-                    {lesson.orderIndex}
-                  </div>
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
+                      completed
+                        ? 'bg-brand-600 text-white'
+                        : 'border-2 border-slate-300 text-slate-400'
+                    }`}
+                    title={completed ? 'Concluída' : 'Pendente'}
+                  >
+                    {completed ? '✓' : '○'}
+                  </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-semibold text-slate-900">{lesson.title}</h3>
+                      <h3
+                        className={`font-semibold ${
+                          completed ? 'text-slate-500 line-through' : 'text-slate-900'
+                        }`}
+                      >
+                        {lesson.title}
+                      </h3>
                       {typeBadge && <Badge variant={typeBadge.variant}>{typeBadge.label}</Badge>}
                     </div>
                   </div>
