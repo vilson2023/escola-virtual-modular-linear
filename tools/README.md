@@ -79,6 +79,35 @@ copy /Y .env.local.bak .env.local
 2. Duplo clique em `fix-env.bat` → `.env.local` fica igual
 3. Duplo clique em `sync-and-run.bat` → servidor reinicia
 
+### Sobre a chave do Asaas e o `$`
+
+A chave do Asaas começa com `$` (ex.: `$aact_hmlg_...`). O Next.js usa `dotenv-expand`, que interpreta `$` como variável — e isso pode zerar a env.
+
+**Solução recomendada:** cole a chave **sem o `$` inicial** no `.env`:
+
+```text
+ASAAS_API_KEY="aact_hmlg_..." ← sem o $
+```
+
+O código (`src/server/payments/asaas.ts`) adiciona o `$` automaticamente.
+
+Formatos antigos (com `\$` ou com `$`) continuam sendo aceitos, mas são mais frágeis.
+
+### diagnose-asaas.bat
+
+Testa a `ASAAS_API_KEY` direto no Asaas via curl, sem passar pelo Next.js. Mostra o comprimento e o prefixo da chave lida (sem vazar o valor) e o HTTP status da resposta.
+
+- **HTTP 200** = a chave é válida; o problema está no carregamento pelo Next.
+- **HTTP 401** = a chave em si está inválida; gere uma nova no painel do Asaas.
+
+Funciona com qualquer um dos formatos de chave (com ou sem `$`/escape — o script normaliza antes de testar).
+
+### report-env.bat
+
+Gera um arquivo `env-report.txt` na raiz do projeto com o diagnóstico completo do ambiente: arquivos presentes, metadados das variáveis (comprimento e prefixo — nunca valores), commit atual e versões de Node/npm.
+
+**Uso:** duplo clique, depois abra o `env-report.txt` e cole o conteúdo no chat do engenheiro. O arquivo é ignorado pelo Git (está no `.gitignore`).
+
 ## fresh-start.bat — versão de emergência
 
 Use **só quando algo der errado**: erro estranho de dependência, projeto não inicia, coisa que não resolve com o script normal.

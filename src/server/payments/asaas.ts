@@ -8,7 +8,38 @@ import type {
 } from './types';
 
 const BASE_URL = process.env.ASAAS_API_URL ?? 'https://api-sandbox.asaas.com/v3';
-const API_KEY = process.env.ASAAS_API_KEY;
+
+const RAW_KEY = process.env.ASAAS_API_KEY ?? '';
+
+// Aceita as três formas:
+//  1. "$aact_hmlg_..." (ideal, sem escape)
+//  2. "\$aact_hmlg_..." (com escape, caso alguém use)
+//  3. "aact_hmlg_..." (sem $, formato "burro" à prova de dotenv-expand)
+function normalizeAsaasKey(raw: string): string {
+  if (!raw) return '';
+
+  let key = raw.trim();
+
+  // Remove barra invertida de escape no início, se houver
+  if (key.startsWith('\\$')) {
+    key = key.slice(1); // remove só a barra: fica "$..."
+  }
+
+  // Se NÃO começa com $, adiciona
+  if (!key.startsWith('$')) {
+    key = '$' + key;
+  }
+
+  return key;
+}
+
+const API_KEY = normalizeAsaasKey(RAW_KEY);
+
+if (process.env.NODE_ENV !== 'production' && API_KEY) {
+  console.log(
+    `[asaas] chave carregada: ${API_KEY.length} chars, prefixo "${API_KEY.slice(0, 12)}..."`,
+  );
+}
 
 if (!API_KEY) {
   console.warn('[asaas] ASAAS_API_KEY não configurada — provider não funcionará');
