@@ -10,6 +10,19 @@ Plataforma LMS modular construída em módulos lineares (M0 → M10).
 - ESLint + Prettier
 - Zod
 
+## Como testar localmente (Windows)
+
+Na primeira vez, clone o repositório e crie os arquivos `.env`/`.env.local` (peça ao Kimi o conteúdo).
+
+Depois, para rodar o projeto, basta **dar duplo clique** em:
+
+- `tools\sync-and-run.bat` → sincroniza com GitHub e inicia o servidor
+- `tools\fresh-start.bat` → reset completo (se algo der errado)
+
+O site estará em http://localhost:3000.
+
+Veja mais detalhes em [tools/README.md](tools/README.md).
+
 ## Comandos
 
 ```bash
