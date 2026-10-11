@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { signOut } from '@/lib/auth';
 import { requireAuth } from '@/server/auth/session';
+import { prisma } from '@/lib/prisma';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -8,6 +8,22 @@ import { Container } from '@/components/ui/Container';
 
 export default async function DashboardPage() {
   const user = await requireAuth();
+
+  const courses = await prisma.course.findMany({
+    orderBy: { createdAt: 'asc' },
+    include: {
+      modules: {
+        orderBy: { orderIndex: 'asc' },
+        select: { id: true },
+      },
+    },
+  });
+
+  const purchases = await prisma.studentPurchase.findMany({
+    where: { userId: user.id, statusPayment: 'PAID' },
+    select: { moduleId: true },
+  });
+  const purchasedModuleIds = new Set(purchases.map((p) => p.moduleId));
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -32,7 +48,7 @@ export default async function DashboardPage() {
 
       <Container className="py-12">
         <h1 className="text-3xl font-bold text-slate-900">Olá, {user.name} 👋</h1>
-        <p className="mt-2 text-slate-500">Pronto para continuar de onde parou?</p>
+        <p className="mt-2 text-slate-500">Continue de onde parou.</p>
 
         <div className="mt-8 space-y-6">
           {user.role === 'ADMIN' && (
@@ -49,12 +65,40 @@ export default async function DashboardPage() {
             </Card>
           )}
 
-          <Card>
-            <h2 className="text-lg font-semibold text-slate-900">Meus cursos</h2>
-            <p className="mt-2 text-sm text-slate-500">
-              Você ainda não começou nenhum curso. Explore a vitrine em breve.
-            </p>
-          </Card>
+          <section>
+            <h2 className="text-lg font-semibold text-slate-900">Meus Cursos</h2>
+            <div className="mt-4 space-y-4">
+              {courses.length === 0 ? (
+                <Card className="text-center">
+                  <p className="text-slate-500">Ainda não há cursos disponíveis.</p>
+                </Card>
+              ) : (
+                courses.map((course) => {
+                  const owned = course.modules.filter((m) =>
+                    purchasedModuleIds.has(m.id),
+                  ).length;
+                  return (
+                    <Card key={course.id} className="flex flex-wrap items-center gap-6">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-lg font-semibold text-slate-900">{course.title}</h3>
+                        {course.description && (
+                          <p className="mt-1 truncate text-sm text-slate-500">
+                            {course.description}
+                          </p>
+                        )}
+                        <p className="mt-1 text-sm text-slate-500">
+                          {course.modules.length} módulos · você possui {owned}
+                        </p>
+                      </div>
+                      <Button href={`/courses/${course.id}`} variant="primary" size="sm">
+                        Continuar
+                      </Button>
+                    </Card>
+                  );
+                })
+              )}
+            </div>
+          </section>
         </div>
       </Container>
     </div>

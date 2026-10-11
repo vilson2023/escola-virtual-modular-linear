@@ -145,6 +145,28 @@ async function main() {
   }
 
   console.log(`📚 Curso criado: ${course.title} (${modulesData.length} módulos)`);
+
+  // ---------- PURCHASE DEMO ----------
+  const firstModule = await prisma.module.findFirst({
+    where: { courseId: course.id, orderIndex: 1 },
+  });
+
+  if (firstModule) {
+    await prisma.studentPurchase.upsert({
+      where: {
+        userId_moduleId: { userId: student.id, moduleId: firstModule.id },
+      },
+      update: {},
+      create: {
+        userId: student.id,
+        moduleId: firstModule.id,
+        statusPayment: 'PAID',
+        purchasedAt: new Date(),
+      },
+    });
+    console.log(`💳 Compra demo: aluno acessa "${firstModule.title}"`);
+  }
+
   console.log('✅ Seed concluído.');
 }
 
