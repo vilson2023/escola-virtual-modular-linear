@@ -4,8 +4,7 @@ import { requireRole } from '@/server/auth/session';
 import { getPaymentProvider } from '@/server/payments';
 
 export type AsaasTestResult =
-  | { ok: true; customerId: string; customerName: string }
-  | { ok: false; error: string };
+  { ok: true; customerId: string; customerName: string } | { ok: false; error: string };
 
 export async function testAsaasConnectionAction(): Promise<AsaasTestResult> {
   await requireRole('ADMIN');

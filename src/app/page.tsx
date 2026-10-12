@@ -40,24 +40,22 @@ export default function Home() {
       </header>
 
       <main>
-        <section className="pt-36 pb-20">
+        <section className="pt-28 pb-16 sm:pt-36 sm:pb-20">
           <Container className="text-center">
             <Badge variant="brand">Novo · Pagamento por progresso</Badge>
-            <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              Aprenda no seu ritmo. Pague pelo seu{' '}
-              <span className="text-brand-600">progresso</span>.
+            <h1 className="mx-auto mt-6 max-w-3xl text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+              Aprenda no seu ritmo. Pague pelo seu <span className="text-brand-600">progresso</span>
+              .
             </h1>
-            <p className="mt-4 text-lg font-medium text-slate-600">
-              Sua jornada, módulo a módulo.
-            </p>
+            <p className="mt-4 text-lg font-medium text-slate-600">Sua jornada, módulo a módulo.</p>
             <p className="mx-auto mt-2 max-w-xl text-base text-slate-500">
               Compre um módulo por vez. Conclua 100%. Destrave o próximo. Certificado no final.
             </p>
-            <div className="mt-8 flex items-center justify-center gap-4">
-              <Button href="/register" variant="primary" size="lg">
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <Button href="/register" variant="primary" size="lg" className="w-full sm:w-auto">
                 Começar agora
               </Button>
-              <Button href="/login" variant="secondary" size="lg">
+              <Button href="/login" variant="secondary" size="lg" className="w-full sm:w-auto">
                 Já tenho conta
               </Button>
             </div>

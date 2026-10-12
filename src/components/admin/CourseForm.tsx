@@ -14,10 +14,7 @@ type Props = {
 };
 
 export function CourseForm({ action, initialData, submitLabel }: Props) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    action,
-    null,
-  );
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(action, null);
 
   return (
     <form action={formAction} className="max-w-2xl space-y-6">
@@ -45,7 +42,7 @@ export function CourseForm({ action, initialData, submitLabel }: Props) {
           name="description"
           rows={4}
           defaultValue={initialData?.description ?? ''}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="focus:ring-brand-500 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm transition focus:border-transparent focus:ring-2 focus:outline-none"
         />
       </div>
 

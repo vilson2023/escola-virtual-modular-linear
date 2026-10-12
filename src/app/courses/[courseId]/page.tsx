@@ -128,7 +128,12 @@ export default async function CourseViewPage({
                     />
                   </div>
                   <div className="mt-4">
-                    <Button href={modulePath} variant="primary" size="sm">
+                    <Button
+                      href={modulePath}
+                      variant="primary"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                    >
                       Continuar
                     </Button>
                   </div>
@@ -165,6 +170,7 @@ export default async function CourseViewPage({
                       href={`/courses/${courseId}/checkout/${module.id}`}
                       variant="primary"
                       size="lg"
+                      className="w-full sm:w-auto"
                     >
                       Quero desbloquear por {brl.format(module.priceCents / 100)}
                     </Button>

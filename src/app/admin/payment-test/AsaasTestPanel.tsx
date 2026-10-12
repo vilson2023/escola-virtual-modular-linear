@@ -2,10 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/Button';
-import {
-  testAsaasConnectionAction,
-  type AsaasTestResult,
-} from '@/server/actions/payment-test';
+import { testAsaasConnectionAction, type AsaasTestResult } from '@/server/actions/payment-test';
 
 export function AsaasTestPanel() {
   const [result, setResult] = useState<AsaasTestResult | null>(null);
@@ -27,8 +24,7 @@ export function AsaasTestPanel() {
 
       {result?.ok && (
         <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700">
-          ✅ Conectado! Customer ID: <code>{result.customerId}</code>, Nome:{' '}
-          {result.customerName}
+          ✅ Conectado! Customer ID: <code>{result.customerId}</code>, Nome: {result.customerName}
         </div>
       )}
 

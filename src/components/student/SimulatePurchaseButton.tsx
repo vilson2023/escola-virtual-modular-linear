@@ -14,7 +14,14 @@ export function SimulatePurchaseButton({ moduleId }: { moduleId: string }) {
 
   return (
     <form action={formAction}>
-      <Button type="submit" variant="ghost" size="sm" disabled={pending}>
+      <Button
+        type="submit"
+        variant="ghost"
+        size="sm"
+        disabled={pending}
+        className="w-full sm:w-auto"
+        aria-label="Simular compra (somente desenvolvimento)"
+      >
         [DEV] Simular compra
       </Button>
       {state?.error && <p className="mt-1 text-xs text-red-600">{state.error}</p>}

@@ -144,13 +144,14 @@ export function CheckoutForm({
 
   return (
     <div className="mt-6 max-w-2xl">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setMethod(tab.id)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+            aria-pressed={method === tab.id}
+            className={`focus-visible:ring-brand-500 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold whitespace-nowrap transition focus-visible:ring-2 focus-visible:outline-none ${
               method === tab.id
                 ? 'bg-brand-600 text-white'
                 : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
@@ -161,7 +162,7 @@ export function CheckoutForm({
         ))}
       </div>
 
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
+      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
         <p className="text-sm text-slate-500">
           {courseTitle} · {moduleTitle}
         </p>
@@ -194,12 +195,18 @@ export function CheckoutForm({
               <div className="text-center">
                 <img
                   src={`data:image/png;base64,${qrCode}`}
-                  alt="QR Code PIX"
-                  className="mx-auto h-56 w-56 rounded-lg border border-slate-200"
+                  alt="QR Code PIX para pagamento"
+                  className="mx-auto aspect-square w-full max-w-[224px] rounded-lg border border-slate-200"
                 />
                 <p className="mt-3 text-xs break-all text-slate-500">{copyPaste}</p>
                 <div className="mt-3 flex justify-center gap-3">
-                  <Button type="button" variant="secondary" size="sm" onClick={handleCopy}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleCopy}
+                    aria-label="Copiar código PIX"
+                  >
                     {copied ? '✓ Copiado!' : 'Copiar código'}
                   </Button>
                 </div>
@@ -217,12 +224,7 @@ export function CheckoutForm({
               <>
                 <p className="text-sm text-slate-600">Boleto vence em 1 dia útil.</p>
                 <div className="mt-4">
-                  <Button
-                    type="button"
-                    variant="primary"
-                    onClick={handleBoleto}
-                    disabled={pending}
-                  >
+                  <Button type="button" variant="primary" onClick={handleBoleto} disabled={pending}>
                     {pending ? 'Gerando...' : 'Gerar boleto'}
                   </Button>
                 </div>
@@ -235,7 +237,7 @@ export function CheckoutForm({
                     href={boletoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
+                    className="bg-brand-600 hover:bg-brand-700 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
                   >
                     Abrir boleto em nova aba ↗
                   </a>
@@ -258,7 +260,7 @@ export function CheckoutForm({
               <Label htmlFor="number">Número do cartão</Label>
               <Input id="number" name="number" type="text" inputMode="numeric" required />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="expiry">Validade (MM/AA)</Label>
                 <Input id="expiry" name="expiry" type="text" placeholder="12/28" required />
@@ -272,7 +274,7 @@ export function CheckoutForm({
               <Label htmlFor="cpfCnpj">CPF do titular</Label>
               <Input id="cpfCnpj" name="cpfCnpj" type="text" inputMode="numeric" required />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="phone">Telefone (com DDD)</Label>
                 <Input

@@ -22,11 +22,14 @@ function parseLesson(formData: FormData) {
 }
 
 // Mantém apenas os campos usados pelo tipo de conteúdo; zera os demais.
-function contentData(contentType: LessonContentType, data: {
-  videoUrl?: string;
-  textContent?: string;
-  fileUrl?: string;
-}) {
+function contentData(
+  contentType: LessonContentType,
+  data: {
+    videoUrl?: string;
+    textContent?: string;
+    fileUrl?: string;
+  },
+) {
   return {
     videoUrl: contentType === 'VIDEO' ? data.videoUrl || null : null,
     textContent: contentType === 'TEXT' ? data.textContent || null : null,

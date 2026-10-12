@@ -8,7 +8,10 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Container } from '@/components/ui/Container';
 
-const contentTypeBadge: Record<string, { label: string; variant: 'brand' | 'neutral' | 'warning' }> = {
+const contentTypeBadge: Record<
+  string,
+  { label: string; variant: 'brand' | 'neutral' | 'warning' }
+> = {
   VIDEO: { label: 'Vídeo', variant: 'brand' },
   TEXT: { label: 'Texto', variant: 'neutral' },
   FILE: { label: 'Arquivo', variant: 'warning' },
@@ -42,8 +45,7 @@ export default async function StudentModulePage({
 
   const totalLessons = module.lessons.length;
   const completedCount = completedSet.size;
-  const percent =
-    totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
+  const percent = totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
   const moduleComplete = totalLessons > 0 && percent === 100;
 
   return (
@@ -63,22 +65,20 @@ export default async function StudentModulePage({
 
         <div className="mt-4">
           <h1 className="text-3xl font-bold text-slate-900">{module.title}</h1>
-          {module.description && (
-            <p className="mt-2 text-slate-500">{module.description}</p>
-          )}
+          {module.description && <p className="mt-2 text-slate-500">{module.description}</p>}
           <p className="mt-4 text-sm text-slate-500">
             {completedCount} de {totalLessons} aulas concluídas ({percent}%)
           </p>
           <div className="mt-2 h-1.5 w-full max-w-md overflow-hidden rounded-full bg-slate-200">
             <div
-              className="h-full rounded-full bg-brand-600 transition-all"
+              className="bg-brand-600 h-full rounded-full transition-all"
               style={{ width: `${percent}%` }}
             />
           </div>
         </div>
 
         {moduleComplete && (
-          <Card className="mt-6 border-brand-200 bg-brand-50 text-center">
+          <Card className="border-brand-200 bg-brand-50 mt-6 text-center">
             <p className="text-xl font-bold text-slate-900">🎉 Módulo concluído!</p>
             <p className="mt-2 text-sm text-slate-600">
               Volte para o curso para ver o próximo módulo na vitrine.

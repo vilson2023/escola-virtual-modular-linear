@@ -10,7 +10,10 @@ import { DeleteButton } from '@/components/admin/DeleteButton';
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-const contentTypeBadge: Record<string, { label: string; variant: 'brand' | 'neutral' | 'warning' }> = {
+const contentTypeBadge: Record<
+  string,
+  { label: string; variant: 'brand' | 'neutral' | 'warning' }
+> = {
   VIDEO: { label: 'Vídeo', variant: 'brand' },
   TEXT: { label: 'Texto', variant: 'neutral' },
   FILE: { label: 'Arquivo', variant: 'warning' },
@@ -121,7 +124,7 @@ export default async function ModuleHubPage({
             const preview = lessonPreview(lesson);
             return (
               <Card key={lesson.id} className="flex items-center gap-6">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white">
+                <div className="bg-brand-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white">
                   {lesson.orderIndex}
                 </div>
 
@@ -130,17 +133,11 @@ export default async function ModuleHubPage({
                     <h3 className="text-lg font-semibold text-slate-900">{lesson.title}</h3>
                     {typeBadge && <Badge variant={typeBadge.variant}>{typeBadge.label}</Badge>}
                   </div>
-                  {preview && (
-                    <p className="mt-1 truncate text-sm text-slate-500">{preview}</p>
-                  )}
+                  {preview && <p className="mt-1 truncate text-sm text-slate-500">{preview}</p>}
                 </div>
 
                 <div className="flex shrink-0 items-center gap-2">
-                  <Button
-                    href={`${hubPath}/lessons/${lesson.id}/edit`}
-                    variant="ghost"
-                    size="sm"
-                  >
+                  <Button href={`${hubPath}/lessons/${lesson.id}/edit`} variant="ghost" size="sm">
                     Editar
                   </Button>
                   <DeleteButton

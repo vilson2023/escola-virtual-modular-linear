@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
+export const metadata = { title: 'Painel Admin' };
+
 export default async function AdminPage() {
   const [userCount, courseCount, moduleCount, lessonCount] = await Promise.all([
     prisma.user.count(),

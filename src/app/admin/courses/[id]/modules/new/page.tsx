@@ -4,11 +4,7 @@ import { requireRole } from '@/server/auth/session';
 import { createModuleAction } from '@/server/actions/modules';
 import { ModuleForm } from '@/components/admin/ModuleForm';
 
-export default async function NewModulePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function NewModulePage({ params }: { params: Promise<{ id: string }> }) {
   await requireRole('ADMIN');
   const { id } = await params;
 

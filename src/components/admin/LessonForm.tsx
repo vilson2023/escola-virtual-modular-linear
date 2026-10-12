@@ -34,13 +34,8 @@ type Props = {
 };
 
 export function LessonForm({ action, initialData, submitLabel, cancelHref }: Props) {
-  const [contentType, setContentType] = useState<ContentType>(
-    initialData?.contentType ?? 'VIDEO',
-  );
-  const [state, formAction, pending] = useActionState<LessonActionState, FormData>(
-    action,
-    null,
-  );
+  const [contentType, setContentType] = useState<ContentType>(initialData?.contentType ?? 'VIDEO');
+  const [state, formAction, pending] = useActionState<LessonActionState, FormData>(action, null);
 
   return (
     <form action={formAction} className="max-w-2xl space-y-6">

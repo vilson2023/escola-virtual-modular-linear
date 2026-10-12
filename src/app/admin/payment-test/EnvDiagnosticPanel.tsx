@@ -20,9 +20,7 @@ function Row({ label, ok, detail }: { label: string; ok: boolean; detail: string
   return (
     <tr>
       <td className="px-3 py-2 font-medium text-slate-700">{label}</td>
-      <td
-        className={`px-3 py-2 font-semibold ${ok ? 'text-green-700' : 'text-red-700'}`}
-      >
+      <td className={`px-3 py-2 font-semibold ${ok ? 'text-green-700' : 'text-red-700'}`}>
         {ok ? 'OK' : 'PROBLEMA'}
       </td>
       <td className="px-3 py-2 text-slate-600">{detail}</td>

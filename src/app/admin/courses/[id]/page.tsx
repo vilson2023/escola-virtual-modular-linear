@@ -10,11 +10,7 @@ import { DeleteButton } from '@/components/admin/DeleteButton';
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-export default async function CourseHubPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function CourseHubPage({ params }: { params: Promise<{ id: string }> }) {
   await requireRole('ADMIN');
   const { id } = await params;
 
@@ -74,7 +70,7 @@ export default async function CourseHubPage({
         ) : (
           course.modules.map((module) => (
             <Card key={module.id} className="flex items-center gap-6">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white">
+              <div className="bg-brand-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white">
                 {module.orderIndex}
               </div>
 

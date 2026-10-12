@@ -38,9 +38,7 @@ export default async function StudentLessonPage({
   const currentIndex = lessons.findIndex((l) => l.id === lesson.id);
   const previousLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
   const nextLesson =
-    currentIndex >= 0 && currentIndex < lessons.length - 1
-      ? lessons[currentIndex + 1]
-      : null;
+    currentIndex >= 0 && currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
 
   const lessonBasePath = `/courses/${courseId}/modules/${moduleId}/lessons`;
 
@@ -54,8 +52,7 @@ export default async function StudentLessonPage({
     }),
   ]);
   const totalLessons = lessons.length;
-  const percent =
-    totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
+  const percent = totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
   const moduleComplete = totalLessons > 0 && percent === 100;
 
   return (
@@ -83,7 +80,7 @@ export default async function StudentLessonPage({
           </p>
           <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
             <div
-              className="h-full rounded-full bg-brand-600 transition-all"
+              className="bg-brand-600 h-full rounded-full transition-all"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -121,7 +118,7 @@ export default async function StudentLessonPage({
                   href={lesson.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-700"
+                  className="bg-brand-600 hover:bg-brand-700 inline-flex items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-white transition"
                 >
                   Abrir arquivo em nova aba ↗
                 </a>
@@ -132,11 +129,7 @@ export default async function StudentLessonPage({
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
           {previousLesson ? (
-            <Button
-              href={`${lessonBasePath}/${previousLesson.id}`}
-              variant="ghost"
-              size="sm"
-            >
+            <Button href={`${lessonBasePath}/${previousLesson.id}`} variant="ghost" size="sm">
               ← Aula anterior
             </Button>
           ) : (
@@ -156,10 +149,8 @@ export default async function StudentLessonPage({
         </div>
 
         {moduleComplete && (
-          <Card className="mt-8 border-brand-200 bg-brand-50 text-center">
-            <p className="text-2xl font-bold text-slate-900">
-              🎉 Você concluiu este módulo!
-            </p>
+          <Card className="border-brand-200 bg-brand-50 mt-8 text-center">
+            <p className="text-2xl font-bold text-slate-900">🎉 Você concluiu este módulo!</p>
             <p className="mt-2 text-sm text-slate-600">
               O próximo módulo já está disponível na vitrine.
             </p>

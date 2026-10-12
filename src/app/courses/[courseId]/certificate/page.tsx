@@ -7,6 +7,15 @@ import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
 import { PrintCertificateButton } from '@/components/student/PrintCertificateButton';
 
+export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }) {
+  const { courseId } = await params;
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: { title: true },
+  });
+  return { title: course ? `Certificado — ${course.title}` : 'Certificado' };
+}
+
 export default async function CertificatePage({
   params,
 }: {
@@ -46,15 +55,15 @@ export default async function CertificatePage({
           {/* Certificado */}
           <div
             id="certificate"
-            className="border-brand-500 shadow-card rounded-2xl border-4 border-double bg-white px-8 py-14 text-center sm:px-14"
+            className="border-brand-500 shadow-card rounded-2xl border-4 border-double bg-white px-4 py-10 text-center sm:px-14 sm:py-14"
           >
             <p className="text-brand-600 text-sm font-semibold tracking-[0.3em] uppercase">dumo</p>
-            <h1 className="mt-6 font-serif text-4xl font-bold text-slate-900 sm:text-5xl">
+            <h1 className="mt-6 font-serif text-3xl font-bold text-slate-900 sm:text-5xl">
               Certificado
             </h1>
             <div className="bg-brand-400 mx-auto mt-6 h-px w-24" />
             <p className="mt-8 text-slate-500">Certificamos que</p>
-            <p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{user.name}</p>
+            <p className="mt-2 text-xl font-bold text-slate-900 sm:text-3xl">{user.name}</p>
             <p className="mx-auto mt-6 max-w-xl text-slate-600">
               concluiu com êxito o curso{' '}
               <span className="font-semibold text-slate-900">{course.title}</span> na plataforma

@@ -8,12 +8,17 @@ import { getPaymentProvider } from '@/server/payments';
 import { ensureAsaasCustomer } from '@/server/payments/checkout';
 
 type PixResult =
-  | { ok: true; purchaseId: string; qrCodeBase64: string; copyPaste: string; expirationDate: string }
+  | {
+      ok: true;
+      purchaseId: string;
+      qrCodeBase64: string;
+      copyPaste: string;
+      expirationDate: string;
+    }
   | { ok: false; error: string };
 
 type BoletoResult =
-  | { ok: true; purchaseId: string; invoiceUrl: string }
-  | { ok: false; error: string };
+  { ok: true; purchaseId: string; invoiceUrl: string } | { ok: false; error: string };
 
 type CardResult = { ok: true; purchaseId: string } | { ok: false; error: string };
 
@@ -26,7 +31,10 @@ function tomorrow(): string {
 async function prepareCheckout(
   userId: string,
   moduleId: string,
-): Promise<{ error: string } | { module: { id: string; title: string; courseId: string; priceCents: number } }> {
+): Promise<
+  | { error: string }
+  | { module: { id: string; title: string; courseId: string; priceCents: number } }
+> {
   const check = await canPurchaseModule(userId, moduleId);
   if (!check.ok) return { error: check.reason };
 

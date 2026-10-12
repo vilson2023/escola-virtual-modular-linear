@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Container } from '@/components/ui/Container';
 
+export const metadata = { title: 'Meu painel' };
+
 export default async function DashboardPage() {
   const user = await requireAuth();
 
@@ -34,14 +36,14 @@ export default async function DashboardPage() {
         <Container className="flex h-16 items-center justify-between">
           <Logo href="/" />
           <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-600">{user.name}</span>
+            <span className="hidden text-sm text-slate-600 sm:inline">{user.name}</span>
             <form
               action={async () => {
                 'use server';
                 await signOut({ redirectTo: '/' });
               }}
             >
-              <Button type="submit" variant="ghost" size="sm">
+              <Button type="submit" variant="ghost" size="sm" aria-label="Sair da conta">
                 Sair
               </Button>
             </form>
@@ -49,7 +51,7 @@ export default async function DashboardPage() {
         </Container>
       </header>
 
-      <Container className="py-12">
+      <Container className="py-8 sm:py-12">
         <h1 className="text-3xl font-bold text-slate-900">Olá, {user.name} 👋</h1>
         <p className="mt-2 text-slate-500">Continue de onde parou.</p>
 

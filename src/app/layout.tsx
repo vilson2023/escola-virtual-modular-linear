@@ -9,8 +9,23 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'dumo — Sua jornada, módulo a módulo',
+  title: {
+    default: 'dumo — Sua jornada, módulo a módulo',
+    template: '%s · dumo',
+  },
   description: 'Plataforma de cursos em módulos lineares com pagamento por progresso.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001'),
+  openGraph: {
+    title: 'dumo — Sua jornada, módulo a módulo',
+    description: 'Plataforma de cursos em módulos lineares com pagamento por progresso.',
+    type: 'website',
+    locale: 'pt_BR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'dumo',
+    description: 'Sua jornada, módulo a módulo.',
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

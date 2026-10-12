@@ -12,15 +12,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <Container className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
+        <Container className="flex h-16 items-center justify-between gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <Logo href="/admin" size="sm" />
             <Badge variant="brand">Admin</Badge>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-6">
             <AdminNav />
-            <div className="flex items-center gap-3 text-sm">
-              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">
+            <div className="flex shrink-0 items-center gap-3 text-sm">
+              <Link
+                href="/dashboard"
+                className="hidden text-slate-600 hover:text-slate-900 sm:inline"
+              >
                 Voltar ao site
               </Link>
               <form
@@ -31,7 +34,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               >
                 <button
                   type="submit"
-                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+                  aria-label="Sair da conta"
+                  className="focus-visible:ring-brand-500 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:outline-none"
                 >
                   Sair
                 </button>

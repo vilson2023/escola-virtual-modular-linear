@@ -20,13 +20,7 @@ export function DeleteButton({ onDelete, confirmMessage, label = 'Excluir' }: Pr
   }
 
   return (
-    <Button
-      type="button"
-      variant="danger"
-      size="sm"
-      onClick={handleClick}
-      disabled={pending}
-    >
+    <Button type="button" variant="danger" size="sm" onClick={handleClick} disabled={pending}>
       {pending ? 'Excluindo...' : label}
     </Button>
   );

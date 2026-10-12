@@ -66,18 +66,15 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export const asaasProvider: PaymentProvider = {
   async createCustomer(input: CreateCustomerInput): Promise<Customer> {
-    const data = await request<{ id: string; name: string; email: string }>(
-      '/customers',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          name: input.name,
-          email: input.email,
-          cpfCnpj: input.cpfCnpj,
-          externalReference: input.externalReference,
-        }),
-      },
-    );
+    const data = await request<{ id: string; name: string; email: string }>('/customers', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: input.name,
+        email: input.email,
+        cpfCnpj: input.cpfCnpj,
+        externalReference: input.externalReference,
+      }),
+    });
     return { id: data.id, name: data.name, email: data.email };
   },
 

@@ -34,7 +34,7 @@ export function Button({
   children,
   ...rest
 }: Props) {
-  const classes = `inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = `inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`;
 
   if (href) {
     return (
