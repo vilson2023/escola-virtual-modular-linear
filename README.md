@@ -40,6 +40,32 @@ Duplo clique em:
 
 Site em http://localhost:3000. Detalhes em [tools/README.md](tools/README.md).
 
+## Webhook do Asaas
+
+Endpoint `POST /api/webhooks/asaas` que recebe eventos de pagamento do Asaas e atualiza o status da compra (`StudentPurchase`) automaticamente — sem depender do polling.
+
+**Eventos processados:**
+
+| Evento | Status da compra |
+|-|-|
+| `PAYMENT_RECEIVED` / `PAYMENT_CONFIRMED` | `PAID` |
+| `PAYMENT_OVERDUE` | `FAILED` |
+| `PAYMENT_REFUNDED` / `PAYMENT_CHARGEBACK_REQUESTED` | `REFUNDED` |
+
+**Características:**
+
+- **Validação por token:** o header `asaas-access-token` precisa ser igual à variável `ASAAS_WEBHOOK_TOKEN` (definida em `.env` e `.env.local`). Sem o token, retorna 401.
+- **Idempotência:** eventos repetidos com o mesmo status retornam `unchanged` e não alteram nada.
+
+**Como configurar:**
+
+1. Gere um token aleatório: `openssl rand -hex 24`
+2. Coloque-o em `ASAAS_WEBHOOK_TOKEN` no `.env` e no `.env.local`
+3. No painel do Asaas, vá em **Integrações → Webhooks** e cadastre:
+   - **URL de produção:** `https://SEU_DOMINIO/api/webhooks/asaas`
+   - **Em desenvolvimento local** o Asaas não alcança `localhost` — use um túnel (ngrok ou cloudflared) e cadastre a URL pública gerada
+   - Configure o mesmo token no campo de autenticação do webhook
+
 ## Scripts úteis
 
 - `npm run dev` → servidor de desenvolvimento (Turbopack)

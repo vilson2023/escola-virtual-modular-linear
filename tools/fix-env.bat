@@ -1,51 +1,67 @@
 @echo off
 chcp 65001 >nul
-title dumo - sincronizar .env e .env.local
+title dumo - sincronizar .env e .env.local (merge)
 cd /d "%~dp0\.."
 
 echo.
 echo ================================================
-echo   dumo - sincronizar .env e .env.local
+echo   dumo - sincronizar .env e .env.local (merge)
 echo ================================================
 echo.
 
 if not exist ".env" (
-  echo [X] Arquivo .env nao encontrado na raiz do projeto.
-  echo     Crie o .env primeiro, depois rode este script.
-  echo.
+  echo [X] Arquivo .env nao encontrado.
   pause
   exit /b 1
 )
 
+echo [1/3] Fazendo backup do .env.local...
 if exist ".env.local" (
-  echo [1/3] Fazendo backup do .env.local atual...
   if exist ".env.local.bak" del /q ".env.local.bak" >nul 2>&1
   copy /Y ".env.local" ".env.local.bak" >nul
-  echo       Backup salvo como .env.local.bak
+  echo      Backup: .env.local.bak
 ) else (
-  echo [1/3] Nenhum .env.local existente - nada para fazer backup.
+  echo      Nenhum .env.local existente - vai ser criado.
 )
 echo.
 
-echo [2/3] Copiando .env para .env.local...
-copy /Y ".env" ".env.local" >nul
+echo [2/3] Fazendo merge (.env vence, variaveis extras do .env.local preservadas)...
+powershell -Command ^
+  "$envPath = '.env';" ^
+  "$localPath = '.env.local';" ^
+  "$extra = @();" ^
+  "$keys = @{};" ^
+  "if (Test-Path $localPath) {" ^
+  "  Get-Content $localPath -Encoding UTF8 | ForEach-Object {" ^
+  "    if ($_ -match '^([A-Z_][A-Z0-9_]*)=(.*)$') {" ^
+  "      $keys[$Matches[1]] = $Matches[2];" ^
+  "    } elseif ($_.Trim() -ne '') { $extra += $_ }" ^
+  "  }" ^
+  "};" ^
+  "Get-Content $envPath -Encoding UTF8 | ForEach-Object {" ^
+  "  if ($_ -match '^([A-Z_][A-Z0-9_]*)=(.*)$') {" ^
+  "    $keys[$Matches[1]] = $Matches[2];" ^
+  "  } elseif ($_.Trim() -ne '') { $extra += $_ }" ^
+  "};" ^
+  "$out = @();" ^
+  "foreach ($k in $keys.Keys | Sort-Object) { $out += ($k + '=' + $keys[$k]) };" ^
+  "$out += $extra;" ^
+  "$utf8 = New-Object System.Text.UTF8Encoding $false;" ^
+  "[System.IO.File]::WriteAllLines((Join-Path (Get-Location) $localPath), $out, $utf8)"
+
 if errorlevel 1 (
-  echo.
-  echo [X] ERRO ao copiar. Verifique se o .env nao esta em uso.
+  echo [X] Erro no merge. Restaure o backup: copy /Y .env.local.bak .env.local
   pause
   exit /b 1
 )
-echo       OK
+echo      OK
 echo.
 
-echo [3/3] Verificando resultado...
+echo [3/3] Verificando resultado (nomes das variaveis)...
+powershell -Command "Get-Content '.env.local' -Encoding UTF8 | Where-Object { $_ -match '^[A-Z_][A-Z0-9_]*=' } | ForEach-Object { Write-Host ('  ' + $_.Split('=')[0]) }"
 echo.
-echo --- Conteudo do .env.local ---
-type ".env.local"
-echo.
-echo ------------------------------
-echo.
-echo Pronto! O .env.local agora e identico ao .env.
-echo Se algo der errado, restaure o backup: copy /Y .env.local.bak .env.local
+
+echo Pronto! .env.local agora tem todas as variaveis dos dois arquivos.
+echo Se algo der errado: copy /Y .env.local.bak .env.local
 echo.
 pause
