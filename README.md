@@ -42,6 +42,20 @@ Site em http://localhost:3000. Detalhes em [tools/README.md](tools/README.md).
 
 > **Nota sobre a porta:** se a porta 3000 estiver ocupada (por exemplo, pelo app do Kimi Desktop), o `sync-and-run.bat` pode subir em 3001. Nesse caso, acesse `http://localhost:3001` e atualize `AUTH_URL` em `.env` e `.env.local` para `http://localhost:3001`, para que os callbacks de autenticação funcionem.
 
+## Deploy
+
+O deploy é feito na **Vercel** a partir do repositório no GitHub. O passo a passo completo está em [docs/vercel-deploy.md](docs/vercel-deploy.md).
+
+```text
+GitHub  →  Vercel  →  Neon (banco de produção)
+              ↓
+           Asaas (webhook de pagamento)
+```
+
+- O script `vercel-build` roda **automaticamente** a cada deploy: `prisma migrate deploy` (migrations no Neon de produção) → `prisma generate` → `next build`. Se a migration falhar, o deploy falha — isso é proposital.
+- O admin de produção é criado uma única vez com `npm run db:seed:prod` (usa `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` das envs).
+- As envs de produção estão documentadas em `.env.production.example`.
+
 ## Webhook do Asaas
 
 Endpoint `POST /api/webhooks/asaas` que recebe eventos de pagamento do Asaas e atualiza o status da compra (`StudentPurchase`) automaticamente — sem depender do polling.

@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:seed:prod": "tsx prisma/seed-prod.ts",
+    "db:studio": "prisma studio",
+    "vercel-build": "prisma migrate deploy && prisma generate && next build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
