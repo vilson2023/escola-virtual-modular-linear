@@ -57,7 +57,7 @@ export async function reseedMyUserAction(): Promise<Result> {
   const user = await requireAuth();
 
   const course = await prisma.course.findFirst({
-    where: { title: 'Curso Demo: Fundamentos' },
+    where: { title: 'Como transformar seu Facebook em uma máquina de vendas' },
   });
   if (!course) return { error: 'Curso demo não encontrado — rode npm run db:seed primeiro' };
 
@@ -65,8 +65,8 @@ export async function reseedMyUserAction(): Promise<Result> {
     where: { courseId: course.id },
     orderBy: { orderIndex: 'asc' },
   });
-  const [m1, m2] = modules;
-  if (!m1 || !m2) return { error: 'Módulos 1 e 2 não encontrados no curso demo' };
+  const [m1, m2, m3] = modules;
+  if (!m1 || !m2 || !m3) return { error: 'Módulos 1, 2 e 3 não encontrados no curso demo' };
 
   // zera o usuário
   await prisma.studentProgress.deleteMany({ where: { userId: user.id } });

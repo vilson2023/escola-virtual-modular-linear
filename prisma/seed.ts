@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+const YT = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+
 async function main() {
   console.log('🌱 Iniciando seed...');
 
@@ -40,82 +42,142 @@ async function main() {
   // ---------- COURSE ----------
   // Apaga o curso demo anterior (se existir) para permitir re-seed limpo
   await prisma.course.deleteMany({
-    where: { title: 'Curso Demo: Fundamentos' },
+    where: { title: 'Como transformar seu Facebook em uma máquina de vendas' },
   });
 
   const course = await prisma.course.create({
     data: {
-      title: 'Curso Demo: Fundamentos',
+      title: 'Como transformar seu Facebook em uma máquina de vendas',
       description:
-        'Curso de demonstração com 3 módulos lineares. Use para testar o fluxo Pay-As-You-Go.',
+        'Aprenda a estruturar sua presença comercial no Facebook, desenvolver conteúdo estratégico, atrair potenciais clientes e organizar um processo de vendas.',
+      shortDescription:
+        'Estruture sua presença comercial no Facebook e transforme seguidores em clientes.',
+      category: 'Marketing Digital',
+      coverImageUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800',
+      learningObjectives:
+        'Como estruturar uma página comercial profissional no Facebook.\n' +
+        'Como planejar conteúdo que atrai e engaja o público certo.\n' +
+        'Como transformar seguidores em leads e leads em clientes.\n' +
+        'Como organizar um processo de vendas simples e repetível.',
+      targetAudience:
+        'Empreendedores, profissionais liberais e pequenos negócios que querem vender no Facebook.',
+      prerequisites: 'Não é necessário ter experiência prévia.',
+      skills:
+        'Estratégia de conteúdo, Gestão de página comercial, Geração de leads, Processo de vendas',
+      hasCertificate: true,
     },
   });
 
   // ---------- MODULES + LESSONS ----------
   const modulesData = [
     {
-      title: 'Módulo 1: Introdução',
-      description: 'Conceitos básicos e visão geral.',
+      title: 'Módulo 1: Fundamentos da presença comercial',
+      description:
+        'Prepare a base: tipos de página, configurações essenciais e a identidade da sua presença no Facebook.',
       orderIndex: 1,
-      priceCents: 9700, // R$ 97,00
-      presentationVideoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      priceCents: 1990, // R$ 19,90
+      estimatedDurationMinutes: 90,
       lessons: [
+        { title: 'Boas-vindas ao curso', contentType: ContentType.VIDEO, videoUrl: YT },
         {
-          title: 'Boas-vindas',
+          title: 'Perfil, página ou grupo: o que usar',
           contentType: ContentType.VIDEO,
-          videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          videoUrl: YT,
         },
         {
-          title: 'Como funciona a plataforma',
+          title: 'Configurando sua página comercial',
           contentType: ContentType.TEXT,
-          textContent: 'Texto explicativo da plataforma...',
-        },
-        {
-          title: 'Primeiros passos',
-          contentType: ContentType.VIDEO,
-          videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          textContent: 'Passo a passo das configurações essenciais...',
         },
       ],
     },
     {
-      title: 'Módulo 2: Prática',
-      description: 'Mão na massa.',
+      title: 'Módulo 2: Estratégia de conteúdo',
+      description:
+        'Aprenda a planejar conteúdo que atrai o público certo e constrói autoridade para o seu negócio.',
       orderIndex: 2,
-      priceCents: 14700, // R$ 147,00
-      presentationVideoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      priceCents: 2990, // R$ 29,90
+      estimatedDurationMinutes: 120,
       lessons: [
+        { title: 'Os 4 pilares do conteúdo', contentType: ContentType.VIDEO, videoUrl: YT },
         {
-          title: 'Exercício 1',
+          title: 'Calendário de conteúdo na prática',
           contentType: ContentType.VIDEO,
-          videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          videoUrl: YT,
         },
         {
-          title: 'Exercício 2',
-          contentType: ContentType.VIDEO,
-          videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          title: 'Exercício: planeje sua primeira semana',
+          contentType: ContentType.TEXT,
+          textContent: 'Exercício prático de planejamento...',
         },
+        { title: 'Formatos que engajam', contentType: ContentType.VIDEO, videoUrl: YT },
       ],
     },
     {
-      title: 'Módulo 3: Avançado',
-      description: 'Conteúdo avançado e encerramento.',
+      title: 'Módulo 3: Atraindo potenciais clientes',
+      description:
+        'Técnicas de atração orgânica e os primeiros passos para gerar leads qualificados.',
       orderIndex: 3,
-      priceCents: 19700, // R$ 197,00
-      presentationVideoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      priceCents: 3990, // R$ 39,90
+      estimatedDurationMinutes: 150,
       lessons: [
+        { title: 'Entendendo o algoritmo', contentType: ContentType.VIDEO, videoUrl: YT },
+        { title: 'Chamadas para ação que convertem', contentType: ContentType.VIDEO, videoUrl: YT },
+        { title: 'Seu primeiro funil de leads', contentType: ContentType.VIDEO, videoUrl: YT },
+      ],
+    },
+    {
+      title: 'Módulo 4: Organizando o processo de vendas',
+      description:
+        'Do primeiro contato ao fechamento: scripts, organização e ferramentas simples de vendas.',
+      orderIndex: 4,
+      priceCents: 4990, // R$ 49,90
+      estimatedDurationMinutes: 120,
+      lessons: [
+        { title: 'O funil de vendas no Facebook', contentType: ContentType.VIDEO, videoUrl: YT },
         {
-          title: 'Aula avançada',
-          contentType: ContentType.VIDEO,
-          videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-        },
-        {
-          title: 'Encerramento',
+          title: 'Scripts de atendimento',
           contentType: ContentType.TEXT,
-          textContent: 'Texto de encerramento...',
+          textContent: 'Modelos de resposta para cada situação...',
         },
+        { title: 'Ferramentas de organização', contentType: ContentType.VIDEO, videoUrl: YT },
+        { title: 'Estudo de caso: venda real', contentType: ContentType.VIDEO, videoUrl: YT },
+      ],
+    },
+    {
+      title: 'Módulo 5: Anúncios para acelerar resultados',
+      description:
+        'Primeiros passos no Gerenciador de Anúncios: público, criativo e orçamento de forma segura.',
+      orderIndex: 5,
+      priceCents: 3990, // R$ 39,90
+      estimatedDurationMinutes: 90,
+      lessons: [
+        { title: 'Quando anunciar', contentType: ContentType.VIDEO, videoUrl: YT },
+        { title: 'Definindo público e orçamento', contentType: ContentType.VIDEO, videoUrl: YT },
+        { title: 'Lendo os primeiros resultados', contentType: ContentType.VIDEO, videoUrl: YT },
+      ],
+    },
+    {
+      title: 'Módulo 6: Escala e automação',
+      description:
+        'Padronize, automatize e escale sua operação comercial para crescer sem perder qualidade.',
+      orderIndex: 6,
+      priceCents: 4990, // R$ 49,90
+      estimatedDurationMinutes: 140,
+      lessons: [
+        { title: 'Métricas que importam', contentType: ContentType.VIDEO, videoUrl: YT },
+        { title: 'Automações com o Meta', contentType: ContentType.VIDEO, videoUrl: YT },
+        {
+          title: 'Plano de crescimento de 90 dias',
+          contentType: ContentType.TEXT,
+          textContent: 'Roteiro de evolução do seu negócio...',
+        },
+        { title: 'Encerramento e próximos passos', contentType: ContentType.VIDEO, videoUrl: YT },
       ],
     },
   ];
+
+  const moduleIds: string[] = [];
 
   for (const m of modulesData) {
     const module = await prisma.module.create({
@@ -125,9 +187,11 @@ async function main() {
         description: m.description,
         orderIndex: m.orderIndex,
         priceCents: m.priceCents,
-        presentationVideoUrl: m.presentationVideoUrl,
+        presentationVideoUrl: YT,
+        estimatedDurationMinutes: m.estimatedDurationMinutes,
       },
     });
+    moduleIds.push(module.id);
 
     let order = 1;
     for (const l of m.lessons) {
@@ -146,26 +210,23 @@ async function main() {
 
   console.log(`📚 Curso criado: ${course.title} (${modulesData.length} módulos)`);
 
-  // ---------- PURCHASE DEMO ----------
-  const firstModule = await prisma.module.findFirst({
-    where: { courseId: course.id, orderIndex: 1 },
+  // ---------- PURCHASES DEMO ----------
+  // Limpa compras anteriores do aluno demo para re-seed idempotente
+  await prisma.studentPurchase.deleteMany({ where: { userId: student.id } });
+
+  const [m1, m2, m3] = moduleIds;
+
+  await prisma.studentPurchase.create({
+    data: { userId: student.id, moduleId: m1, statusPayment: 'PAID', purchasedAt: new Date() },
+  });
+  await prisma.studentPurchase.create({
+    data: { userId: student.id, moduleId: m2, statusPayment: 'PAID', purchasedAt: new Date() },
+  });
+  await prisma.studentPurchase.create({
+    data: { userId: student.id, moduleId: m3, statusPayment: 'PENDING' },
   });
 
-  if (firstModule) {
-    await prisma.studentPurchase.upsert({
-      where: {
-        userId_moduleId: { userId: student.id, moduleId: firstModule.id },
-      },
-      update: {},
-      create: {
-        userId: student.id,
-        moduleId: firstModule.id,
-        statusPayment: 'PAID',
-        purchasedAt: new Date(),
-      },
-    });
-    console.log(`💳 Compra demo: aluno acessa "${firstModule.title}"`);
-  }
+  console.log('💳 Compras demo: M1 e M2 PAID · M3 PENDING');
 
   console.log('✅ Seed concluído.');
 }

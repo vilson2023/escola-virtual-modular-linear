@@ -64,6 +64,16 @@ model Course {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Campos de marketing (M12a)
+  coverImageUrl      String? // capa do card na vitrine
+  category           String? // Ex.: "Marketing Digital", "Programação"
+  shortDescription   String? // descrição curta para o card da vitrine
+  learningObjectives String? // texto longo (markdown/parágrafos)
+  targetAudience     String? // para quem é
+  prerequisites      String? // conhecimentos necessários
+  skills             String? // habilidades (separadas por vírgula)
+  hasCertificate     Boolean  @default(true)
+
   modules      Module[]
   certificates Certificate[]
 
@@ -77,7 +87,8 @@ model Module {
   description          String?
   orderIndex           Int      // ordem linear: 1, 2, 3...
   priceCents           Int      // preço em centavos (evita float)
-  presentationVideoUrl String?  // vídeo de vitrine do próximo módulo
+  presentationVideoUrl String? // vídeo de vitrine do próximo módulo
+  estimatedDurationMinutes Int? // duração estimada em minutos
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
