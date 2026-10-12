@@ -53,7 +53,7 @@ GitHub  →  Vercel  →  Neon (banco de produção)
 ```
 
 - O script `vercel-build` roda **automaticamente** a cada deploy: `prisma migrate deploy` (migrations no Neon de produção) → `prisma generate` → `next build`. Se a migration falhar, o deploy falha — isso é proposital.
-- O admin de produção é criado uma única vez com `npm run db:seed:prod` (usa `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` das envs).
+- O admin de produção é criado uma única vez com `npm run db:seed:prod` (usa `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` das envs). Adicione `SEED_DEMO_COURSE=true` ao comando para popular também o curso demo em produção (remova ao publicar de verdade).
 - As envs de produção estão documentadas em `.env.production.example`.
 
 ## Webhook do Asaas

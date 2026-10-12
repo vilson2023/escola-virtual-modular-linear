@@ -1,228 +1,162 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { requireAuth } from '@/server/auth/session';
 import { getCourseModulesForStudent } from '@/server/services/module-state';
-import { canIssueCertificate } from '@/server/services/certificate';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { Container } from '@/components/ui/Container';
-import { SimulatePurchaseButton } from '@/components/student/SimulatePurchaseButton';
+import { CourseTabs } from '@/components/course/CourseTabs';
+import { ModuleCard } from '@/components/course/ModuleCard';
+import { ProgressCard } from '@/components/course/ProgressCard';
+import { InfoCard } from '@/components/course/InfoCard';
 
-const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
-export default async function CourseViewPage({
-  params,
-}: {
-  params: Promise<{ courseId: string }>;
-}) {
-  const user = await requireAuth();
+export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
-
   const course = await prisma.course.findUnique({
     where: { id: courseId },
-    select: { id: true, title: true, description: true },
+    select: { title: true },
   });
+  return { title: course ? course.title : 'Curso' };
+}
+
+export default async function CoursePage({ params }: { params: Promise<{ courseId: string }> }) {
+  const { courseId } = await params;
+
+  const course = await prisma.course.findUnique({ where: { id: courseId } });
   if (!course) notFound();
 
-  const modules = await getCourseModulesForStudent(user.id, courseId);
+  // A página é pública: anônimos veem os módulos como "Disponível/Bloqueado".
+  // Para anônimos usamos um userId inexistente — sem compras nem progresso,
+  // o backend retorna o estado natural da fila (M1 VITRINE, demais BLOQUEADO).
+  const session = await auth();
+  const userId = session?.user?.id ?? crypto.randomUUID();
+  const isLoggedIn = !!session?.user;
 
-  // Certificado (regra 4): banner quando 100% concluído e ainda não emitido,
-  // selo quando já existe. Só consulta aqui — a emissão acontece na página
-  // /certificate, para que o banner "está pronto" apareça antes de emitir.
-  const certificateReady = await canIssueCertificate(user.id, courseId);
-  const certificate = certificateReady
-    ? await prisma.certificate.findUnique({
-        where: { userId_courseId: { userId: user.id, courseId } },
-        select: { code: true },
-      })
-    : null;
+  const modules = await getCourseModulesForStudent(userId, courseId);
 
-  const lessons = await prisma.lesson.findMany({
-    where: { module: { courseId } },
-    select: { moduleId: true, title: true, orderIndex: true },
-    orderBy: { orderIndex: 'asc' },
-  });
-  const lessonsByModule = new Map<string, { title: string }[]>();
-  for (const l of lessons) {
-    const list = lessonsByModule.get(l.moduleId) ?? [];
-    list.push({ title: l.title });
-    lessonsByModule.set(l.moduleId, list);
-  }
+  const sobreContent = (
+    <div className="space-y-8">
+      <section>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+          <span aria-hidden>🎯</span> O que você vai aprender
+        </h2>
+        <div className="mt-3 space-y-3 text-sm leading-relaxed whitespace-pre-line text-slate-600">
+          {course.learningObjectives ?? course.description ?? ''}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+          <span aria-hidden>👤</span> Para quem é este curso
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">
+          {course.targetAudience ?? 'Qualquer pessoa interessada no tema.'}
+        </p>
+      </section>
+
+      <section>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+          <span aria-hidden>📖</span> Conhecimentos necessários
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">
+          {course.prerequisites ?? 'Nenhum pré-requisito.'}
+        </p>
+      </section>
+
+      {course.skills && (
+        <section>
+          <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+            <span aria-hidden>✅</span> Habilidades que você vai desenvolver
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {course.skills.split(',').map((s) => (
+              <li key={s.trim()} className="flex items-center gap-2 text-sm text-slate-600">
+                <span className="text-emerald-600">✓</span> {s.trim()}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+
+  const modulosContent = (
+    <div>
+      <h2 className="text-lg font-bold text-slate-900">Módulos do curso</h2>
+      <p className="mt-1 mb-6 text-sm text-slate-500">
+        {modules.length} módulo{modules.length === 1 ? '' : 's'} no total
+      </p>
+      <div className="space-y-4">
+        {modules.map((m, i) => (
+          <ModuleCard key={m.id} module={m} index={i + 1} courseId={courseId} />
+        ))}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Container className="py-10">
-        <nav className="text-sm text-slate-500">
-          <Link href="/dashboard" className="hover:text-slate-700">
-            Meus Cursos
-          </Link>
-          {' / '}
-          <span className="font-medium text-slate-900">{course.title}</span>
-        </nav>
-
-        <div className="mt-4">
-          <h1 className="text-3xl font-bold text-slate-900">{course.title}</h1>
-          {course.description && <p className="mt-2 text-slate-500">{course.description}</p>}
-        </div>
-
-        {certificateReady && !certificate && (
-          <Card className="border-brand-500 bg-brand-50 ring-brand-200 mt-6 ring-2">
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="text-3xl" aria-hidden>
-                🏆
-              </span>
-              <div className="min-w-0 flex-1">
-                <h2 className="text-lg font-semibold text-slate-900">
-                  Seu certificado está pronto!
-                </h2>
-                <p className="mt-1 text-sm text-slate-600">
-                  Você concluiu 100% do curso. Emita agora o seu certificado.
-                </p>
+    <main>
+      {/* Hero do curso */}
+      <section className="bg-gradient-to-r from-[#0B3D4F] to-[#0F5468] py-10 text-white">
+        <Container>
+          <div className="grid items-start gap-8 lg:grid-cols-[1fr_auto]">
+            <div>
+              {course.category && (
+                <span className="rounded-md bg-blue-500/90 px-2 py-1 text-xs font-semibold text-white">
+                  {course.category}
+                </span>
+              )}
+              <h1 className="mt-3 text-3xl font-bold sm:text-4xl lg:text-5xl">{course.title}</h1>
+              <p className="mt-4 max-w-2xl text-white/80">
+                {course.shortDescription ?? course.description ?? ''}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-4 text-sm text-white/70">
+                <span>📚 {modules.length} módulos</span>
+                <span>♾️ Acesso vitalício</span>
+                {course.hasCertificate && <span>🏆 Certificado de conclusão</span>}
               </div>
-              <Button href={`/courses/${courseId}/certificate`} variant="primary" size="lg">
-                Emitir certificado →
-              </Button>
             </div>
-          </Card>
-        )}
+            {course.coverImageUrl && (
+              <div className="hidden lg:block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={course.coverImageUrl}
+                  alt={course.title}
+                  className="w-full max-w-md rounded-2xl shadow-2xl"
+                />
+              </div>
+            )}
+          </div>
+        </Container>
+      </section>
 
-        {certificate && (
-          <Card className="mt-6 flex flex-wrap items-center gap-3 border-emerald-200 bg-emerald-50">
-            <span className="text-2xl" aria-hidden>
-              🎓
-            </span>
-            <p className="min-w-0 flex-1 text-sm font-medium text-emerald-800">
-              Certificado emitido{' '}
-              <span className="font-mono text-emerald-700">({certificate.code})</span>
-            </p>
-            <Button href={`/courses/${courseId}/certificate`} variant="ghost" size="sm">
-              Ver certificado →
-            </Button>
-          </Card>
-        )}
+      {/* Corpo: coluna principal + sidebar */}
+      <Container className="py-10">
+        <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
+          <div>
+            <CourseTabs sobre={sobreContent} modulos={modulosContent} />
+          </div>
 
-        <div className="mt-8 space-y-6">
-          {modules.map((module) => {
-            const modulePath = `/courses/${courseId}/modules/${module.id}`;
-
-            if (module.state === 'LIBERADO') {
-              return (
-                <Card key={module.id} className="border-brand-500 border-l-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-xl font-semibold text-slate-900">{module.title}</h2>
-                    <Badge variant="success">Liberado</Badge>
-                    {module.progressPercent === 100 && <Badge variant="brand">✓ Concluído</Badge>}
-                  </div>
-                  {module.description && (
-                    <p className="mt-1 text-sm text-slate-500">{module.description}</p>
-                  )}
-                  <p className="mt-2 text-sm text-slate-500">
-                    {module.lessonCount} aulas · {module.progressPercent}% concluído
-                  </p>
-                  <div className="mt-2 h-1.5 w-full max-w-md overflow-hidden rounded-full bg-slate-200">
-                    <div
-                      className="bg-brand-600 h-full rounded-full"
-                      style={{ width: `${module.progressPercent}%` }}
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <Button
-                      href={modulePath}
-                      variant="primary"
-                      size="sm"
-                      className="w-full sm:w-auto"
-                    >
-                      Continuar
-                    </Button>
-                  </div>
-                </Card>
-              );
-            }
-
-            if (module.state === 'VITRINE') {
-              return (
-                <Card key={module.id} className="ring-brand-200 ring-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-xl font-semibold text-slate-900">{module.title}</h2>
-                    <Badge variant="brand">Disponível</Badge>
-                  </div>
-
-                  {module.presentationVideoUrl && (
-                    <div className="ring-brand-500/40 shadow-glow-brand mt-4 aspect-video w-full overflow-hidden rounded-xl ring-2">
-                      <iframe
-                        src={module.presentationVideoUrl}
-                        title={`Apresentação: ${module.title}`}
-                        className="h-full w-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    </div>
-                  )}
-
-                  <p className="mt-4 text-2xl font-bold text-slate-900">
-                    {brl.format(module.priceCents / 100)}
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-3">
-                    <Button
-                      href={`/courses/${courseId}/checkout/${module.id}`}
-                      variant="primary"
-                      size="lg"
-                      className="from-brand-600 to-brand-500 w-full bg-gradient-to-r shadow-md sm:w-auto"
-                    >
-                      Quero desbloquear por {brl.format(module.priceCents / 100)}
-                    </Button>
-                    {process.env.NODE_ENV !== 'production' && (
-                      <SimulatePurchaseButton moduleId={module.id} />
-                    )}
-                  </div>
-
-                  {process.env.NODE_ENV !== 'production' && (
-                    <p className="mt-3 text-xs text-slate-400">
-                      [DEV] Botão "Simular compra" ignora o gateway.
-                    </p>
-                  )}
-
-                  <ul className="mt-6 space-y-2">
-                    {(lessonsByModule.get(module.id) ?? []).map((lesson, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-slate-400">
-                        <span aria-hidden>🔒</span>
-                        <span>{lesson.title}</span>
-                      </li>
-                    ))}
-                    {module.lessonCount === 0 && (
-                      <li className="text-sm text-slate-400">
-                        <span aria-hidden>🔒</span> Nenhuma aula disponível ainda.
-                      </li>
-                    )}
-                  </ul>
-                </Card>
-              );
-            }
-
-            return (
-              <Card key={module.id} className="bg-slate-50 opacity-60">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl" aria-hidden>
-                    🔒
-                  </span>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-xl font-semibold text-slate-500">{module.title}</h2>
-                      <Badge variant="neutral">Bloqueado</Badge>
-                    </div>
-                    <p className="mt-1 text-sm text-slate-400">
-                      Conclua o módulo anterior para liberar esta apresentação.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+          <aside className="h-fit space-y-4 lg:sticky lg:top-24">
+            <ProgressCard
+              courseId={courseId}
+              modules={modules}
+              isLoggedIn={isLoggedIn}
+              hasCertificate={course.hasCertificate}
+            />
+            <InfoCard
+              icon="🛡️"
+              title="Aprendizado seguro"
+              text="Seus pagamentos são processados com segurança e seu acesso é liberado apenas após a confirmação do pagamento."
+            />
+            {course.hasCertificate && (
+              <InfoCard
+                icon="🏆"
+                title="Certificado de conclusão"
+                text="Ao concluir todos os módulos, você recebe um certificado digital de conclusão do curso."
+              />
+            )}
+          </aside>
         </div>
       </Container>
-    </div>
+    </main>
   );
 }

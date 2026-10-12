@@ -1,5 +1,6 @@
 import { PrismaClient, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { createDemoCourse } from './demo-course';
 
 const prisma = new PrismaClient();
 
@@ -43,6 +44,15 @@ async function main() {
 
   console.log(`✅ Admin pronto: ${admin.email}`);
   console.log('⚠️  Guarde a senha em local seguro. Ela não será mostrada novamente.');
+
+  // ---------- CURSO DEMO (opcional) ----------
+  // SEED_DEMO_COURSE=true popula o curso demo em produção (útil para
+  // demonstrar a plataforma). Remova quando for publicar de verdade.
+  if (process.env.SEED_DEMO_COURSE === 'true') {
+    console.log('🌱 SEED_DEMO_COURSE=true — populando curso demo...');
+    const { moduleIds } = await createDemoCourse(prisma);
+    console.log(`📚 Curso demo criado em produção (${moduleIds.length} módulos)`);
+  }
 }
 
 main()

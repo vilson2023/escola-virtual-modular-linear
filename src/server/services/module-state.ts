@@ -9,7 +9,10 @@ export type ModuleWithState = {
   orderIndex: number;
   priceCents: number;
   presentationVideoUrl: string | null;
+  estimatedDurationMinutes: number | null; // NOVO (M12b)
   lessonCount: number;
+  completedCount: number; // NOVO (M12b)
+  isPurchased: boolean; // NOVO (M12b)
   state: ModuleState;
   progressPercent: number;
 };
@@ -104,7 +107,10 @@ export async function getCourseModulesForStudent(
       orderIndex: m.orderIndex,
       priceCents: m.priceCents,
       presentationVideoUrl: m.presentationVideoUrl,
+      estimatedDurationMinutes: m.estimatedDurationMinutes,
       lessonCount,
+      completedCount,
+      isPurchased,
       state,
       progressPercent,
     });
