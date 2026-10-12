@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/server/auth/session';
 import { getCourseModulesForStudent } from '@/server/services/module-state';
+import { canIssueCertificate } from '@/server/services/certificate';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -26,6 +27,17 @@ export default async function CourseViewPage({
   if (!course) notFound();
 
   const modules = await getCourseModulesForStudent(user.id, courseId);
+
+  // Certificado (regra 4): banner quando 100% concluído e ainda não emitido,
+  // selo quando já existe. Só consulta aqui — a emissão acontece na página
+  // /certificate, para que o banner "está pronto" apareça antes de emitir.
+  const certificateReady = await canIssueCertificate(user.id, courseId);
+  const certificate = certificateReady
+    ? await prisma.certificate.findUnique({
+        where: { userId_courseId: { userId: user.id, courseId } },
+        select: { code: true },
+      })
+    : null;
 
   const lessons = await prisma.lesson.findMany({
     where: { module: { courseId } },
@@ -54,6 +66,42 @@ export default async function CourseViewPage({
           <h1 className="text-3xl font-bold text-slate-900">{course.title}</h1>
           {course.description && <p className="mt-2 text-slate-500">{course.description}</p>}
         </div>
+
+        {certificateReady && !certificate && (
+          <Card className="border-brand-500 bg-brand-50 ring-brand-200 mt-6 ring-2">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="text-3xl" aria-hidden>
+                🏆
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Seu certificado está pronto!
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Você concluiu 100% do curso. Emita agora o seu certificado.
+                </p>
+              </div>
+              <Button href={`/courses/${courseId}/certificate`} variant="primary" size="lg">
+                Emitir certificado →
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {certificate && (
+          <Card className="mt-6 flex flex-wrap items-center gap-3 border-emerald-200 bg-emerald-50">
+            <span className="text-2xl" aria-hidden>
+              🎓
+            </span>
+            <p className="min-w-0 flex-1 text-sm font-medium text-emerald-800">
+              Certificado emitido{' '}
+              <span className="font-mono text-emerald-700">({certificate.code})</span>
+            </p>
+            <Button href={`/courses/${courseId}/certificate`} variant="ghost" size="sm">
+              Ver certificado →
+            </Button>
+          </Card>
+        )}
 
         <div className="mt-8 space-y-6">
           {modules.map((module) => {

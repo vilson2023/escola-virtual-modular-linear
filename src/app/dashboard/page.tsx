@@ -1,5 +1,6 @@
 import { signOut } from '@/lib/auth';
 import { requireAuth } from '@/server/auth/session';
+import { getCertificatesForStudent } from '@/server/services/certificate';
 import { prisma } from '@/lib/prisma';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +25,8 @@ export default async function DashboardPage() {
     select: { moduleId: true },
   });
   const purchasedModuleIds = new Set(purchases.map((p) => p.moduleId));
+
+  const certificates = await getCertificatesForStudent(user.id);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -65,8 +68,40 @@ export default async function DashboardPage() {
             </Card>
           )}
 
+          {certificates.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900">Seus certificados</h2>
+              <div className="mt-4 space-y-4">
+                {certificates.map((cert) => (
+                  <Card
+                    key={cert.id}
+                    className="flex flex-wrap items-center gap-6 border-emerald-200 bg-emerald-50"
+                  >
+                    <span className="text-2xl" aria-hidden>
+                      🎓
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-semibold text-slate-900">{cert.course.title}</h3>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Código <span className="font-mono">{cert.code}</span> · emitido em{' '}
+                        {cert.issuedAt.toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                    <Button
+                      href={`/courses/${cert.courseId}/certificate`}
+                      variant="primary"
+                      size="sm"
+                    >
+                      Ver certificado →
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+
           <section>
-            <h2 className="text-lg font-semibold text-slate-900">Meus Cursos</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Meus Cursos</h2>{' '}
             <div className="mt-4 space-y-4">
               {courses.length === 0 ? (
                 <Card className="text-center">
@@ -74,9 +109,7 @@ export default async function DashboardPage() {
                 </Card>
               ) : (
                 courses.map((course) => {
-                  const owned = course.modules.filter((m) =>
-                    purchasedModuleIds.has(m.id),
-                  ).length;
+                  const owned = course.modules.filter((m) => purchasedModuleIds.has(m.id)).length;
                   return (
                     <Card key={course.id} className="flex flex-wrap items-center gap-6">
                       <div className="min-w-0 flex-1">

@@ -40,17 +40,19 @@ Duplo clique em:
 
 Site em http://localhost:3000. Detalhes em [tools/README.md](tools/README.md).
 
+> **Nota sobre a porta:** se a porta 3000 estiver ocupada (por exemplo, pelo app do Kimi Desktop), o `sync-and-run.bat` pode subir em 3001. Nesse caso, acesse `http://localhost:3001` e atualize `AUTH_URL` em `.env` e `.env.local` para `http://localhost:3001`, para que os callbacks de autenticação funcionem.
+
 ## Webhook do Asaas
 
 Endpoint `POST /api/webhooks/asaas` que recebe eventos de pagamento do Asaas e atualiza o status da compra (`StudentPurchase`) automaticamente — sem depender do polling.
 
 **Eventos processados:**
 
-| Evento | Status da compra |
-|-|-|
-| `PAYMENT_RECEIVED` / `PAYMENT_CONFIRMED` | `PAID` |
-| `PAYMENT_OVERDUE` | `FAILED` |
-| `PAYMENT_REFUNDED` / `PAYMENT_CHARGEBACK_REQUESTED` | `REFUNDED` |
+| Evento                                              | Status da compra |
+| --------------------------------------------------- | ---------------- |
+| `PAYMENT_RECEIVED` / `PAYMENT_CONFIRMED`            | `PAID`           |
+| `PAYMENT_OVERDUE`                                   | `FAILED`         |
+| `PAYMENT_REFUNDED` / `PAYMENT_CHARGEBACK_REQUESTED` | `REFUNDED`       |
 
 **Características:**
 
@@ -91,7 +93,7 @@ Após rodar o seed:
 - [x] **M3a** — CRUD de Cursos
 - [x] **Design** — Marca dumo + design system
 - [x] **Tools** — Scripts de produtividade para Windows
-- [ ] **M3b** — CRUD de Módulos dentro do curso *(em andamento)*
+- [ ] **M3b** — CRUD de Módulos dentro do curso _(em andamento)_
 - [ ] **M3c** — CRUD de Aulas dentro do módulo
 - [ ] **M4** — Painel do aluno: guard de acesso por compra
 - [ ] **M5** — Progresso de aulas + gatilho de 100%
