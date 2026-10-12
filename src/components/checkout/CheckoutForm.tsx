@@ -9,6 +9,9 @@ import {
   createPixPaymentAction,
   createBoletoPaymentAction,
   createCreditCardPaymentAction,
+  createBundlePixPaymentAction,
+  createBundleBoletoPaymentAction,
+  createBundleCreditCardPaymentAction,
   getPaymentStatusAction,
 } from '@/server/actions/checkout';
 
@@ -16,10 +19,12 @@ type Method = 'PIX' | 'BOLETO' | 'CREDIT_CARD';
 
 type Props = {
   courseId: string;
-  moduleId: string;
   courseTitle: string;
-  moduleTitle: string;
+  itemTitle: string; // título do item: nome do módulo ou "Formação completa"
   priceFormatted: string;
+  mode: 'module' | 'bundle';
+  moduleId?: string; // obrigatório quando mode === 'module'
+  includedItems?: string[]; // bundle: módulos inclusos no pacote
 };
 
 const tabs: { id: Method; label: string }[] = [
@@ -33,10 +38,12 @@ const inputClassName =
 
 export function CheckoutForm({
   courseId,
-  moduleId,
   courseTitle,
-  moduleTitle,
+  itemTitle,
   priceFormatted,
+  mode,
+  moduleId,
+  includedItems,
 }: Props) {
   const router = useRouter();
   const [method, setMethod] = useState<Method>('PIX');
@@ -51,21 +58,27 @@ export function CheckoutForm({
   const [copied, setCopied] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const modulePath = `/courses/${courseId}/modules/${moduleId}`;
+  const successPath =
+    mode === 'module' && moduleId
+      ? `/courses/${courseId}/modules/${moduleId}`
+      : `/courses/${courseId}`;
 
   function handleCardSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      const res = await createCreditCardPaymentAction(moduleId, formData);
+      const res =
+        mode === 'module' && moduleId
+          ? await createCreditCardPaymentAction(moduleId, formData)
+          : await createBundleCreditCardPaymentAction(courseId, formData);
       if (!res.ok) {
         setError(res.error);
         return;
       }
       stopPolling();
       setPaid(true);
-      setTimeout(() => router.push(modulePath), 1500);
+      setTimeout(() => router.push(successPath), 1500);
     });
   }
 
@@ -84,7 +97,7 @@ export function CheckoutForm({
         if ('status' in res && res.status === 'PAID') {
           stopPolling();
           setPaid(true);
-          setTimeout(() => router.push(modulePath), 1500);
+          setTimeout(() => router.push(successPath), 1500);
         }
       } catch {
         // ignora erros transientes de rede; o próximo tick tenta de novo
@@ -101,7 +114,10 @@ export function CheckoutForm({
     setBoletoUrl(null);
     setPaid(false);
     startTransition(async () => {
-      const res = await createPixPaymentAction(moduleId);
+      const res =
+        mode === 'module' && moduleId
+          ? await createPixPaymentAction(moduleId)
+          : await createBundlePixPaymentAction(courseId);
       if (!res.ok) {
         setError(res.error);
         return;
@@ -120,7 +136,10 @@ export function CheckoutForm({
     setBoletoUrl(null);
     setPaid(false);
     startTransition(async () => {
-      const res = await createBoletoPaymentAction(moduleId);
+      const res =
+        mode === 'module' && moduleId
+          ? await createBoletoPaymentAction(moduleId)
+          : await createBundleBoletoPaymentAction(courseId);
       if (!res.ok) {
         setError(res.error);
         return;
@@ -164,9 +183,19 @@ export function CheckoutForm({
 
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
         <p className="text-sm text-slate-500">
-          {courseTitle} · {moduleTitle}
+          {courseTitle} · {itemTitle}
         </p>
         <p className="mt-2 text-3xl font-bold text-slate-900">{priceFormatted}</p>
+
+        {mode === 'bundle' && includedItems && includedItems.length > 0 && (
+          <ul className="mt-4 space-y-1.5 border-t border-slate-100 pt-4">
+            {includedItems.map((item) => (
+              <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
+                <span className="text-emerald-600">✓</span> {item}
+              </li>
+            ))}
+          </ul>
+        )}
 
         {error && (
           <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -176,7 +205,7 @@ export function CheckoutForm({
 
         {paid && (
           <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
-            ✅ Pagamento aprovado! Redirecionando para o módulo...
+            ✅ Pagamento aprovado! Redirecionando...
           </div>
         )}
 

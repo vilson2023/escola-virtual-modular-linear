@@ -32,9 +32,53 @@ export function ProgressCard({ courseId, modules, isLoggedIn, hasCertificate }: 
   const overallPercent =
     totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100);
 
-  // Próximo módulo a continuar: primeiro adquirido e não concluído
-  const nextModule = modules.find((m) => m.isPurchased && m.progressPercent < 100);
   const allConcluded = total > 0 && concluded === total;
+
+  // ---------- Recomendação inteligente do próximo passo (M12c) ----------
+  // Ordem de prioridade: em andamento → adquirido sem progresso → próximo
+  // disponível (todos os adquiridos concluídos) → nada adquirido → 100%.
+  const indexOf = (m: ModuleWithState) => modules.indexOf(m) + 1;
+
+  const inProgress = modules.find(
+    (m) => m.isPurchased && m.progressPercent > 0 && m.progressPercent < 100,
+  );
+  const acquiredNoProgress = modules.find((m) => m.isPurchased && m.progressPercent === 0);
+  const nextAvailable = modules.find((m) => !m.isPurchased);
+
+  type Recommendation = {
+    title: string;
+    buttonLabel: string;
+    href: string;
+  } | null;
+
+  let recommendation: Recommendation = null;
+  if (inProgress) {
+    recommendation = {
+      title: `Continue o Módulo ${indexOf(inProgress)}: ${inProgress.title}`,
+      buttonLabel: 'Continuar aprendendo',
+      href: `/courses/${courseId}/modules/${inProgress.id}`,
+    };
+  } else if (acquiredNoProgress) {
+    recommendation = {
+      title: `Comece o Módulo ${indexOf(acquiredNoProgress)}: ${acquiredNoProgress.title}`,
+      buttonLabel: 'Começar agora',
+      href: `/courses/${courseId}/modules/${acquiredNoProgress.id}`,
+    };
+  } else if (purchased > 0 && nextAvailable) {
+    // Todos os adquiridos concluídos e o próximo está disponível.
+    // Tom convidativo: opção, não pressão.
+    recommendation = {
+      title: `Quando estiver pronto, o próximo passo é o Módulo ${indexOf(nextAvailable)}: ${nextAvailable.title}`,
+      buttonLabel: 'Conhecer este módulo',
+      href: `/courses/${courseId}/modules/${nextAvailable.id}`,
+    };
+  } else if (purchased === 0 && nextAvailable) {
+    recommendation = {
+      title: `Comece pelo Módulo ${indexOf(nextAvailable)}: ${nextAvailable.title}`,
+      buttonLabel: 'Começar agora',
+      href: `/courses/${courseId}/checkout/${nextAvailable.id}`,
+    };
+  }
 
   return (
     <div className="shadow-card rounded-2xl border border-slate-200 bg-white p-5">
@@ -61,22 +105,33 @@ export function ProgressCard({ courseId, modules, isLoggedIn, hasCertificate }: 
         </div>
       </div>
 
-      {nextModule && (
-        <Link
-          href={`/courses/${courseId}/modules/${nextModule.id}`}
-          className="bg-brand-600 hover:bg-brand-700 mt-4 inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
-        >
-          Continuar de onde parei
-        </Link>
-      )}
-
-      {allConcluded && hasCertificate && (
-        <Link
-          href={`/courses/${courseId}/certificate`}
-          className="bg-brand-600 hover:bg-brand-700 mt-4 inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
-        >
-          🏆 Ver certificado
-        </Link>
+      {allConcluded ? (
+        <div className="mt-5 border-t border-slate-100 pt-4">
+          <p className="text-sm font-semibold text-emerald-700">🎉 Você concluiu tudo!</p>
+          {hasCertificate && (
+            <Link
+              href={`/courses/${courseId}/certificate`}
+              className="bg-brand-600 hover:bg-brand-700 mt-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
+            >
+              🏆 Ver certificado
+            </Link>
+          )}
+        </div>
+      ) : (
+        recommendation && (
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
+              Próximo passo recomendado
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{recommendation.title}</p>
+            <Link
+              href={recommendation.href}
+              className="bg-brand-600 hover:bg-brand-700 mt-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md"
+            >
+              {recommendation.buttonLabel}
+            </Link>
+          </div>
+        )
       )}
     </div>
   );

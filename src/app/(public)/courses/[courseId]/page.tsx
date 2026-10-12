@@ -2,11 +2,13 @@ import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getCourseModulesForStudent } from '@/server/services/module-state';
+import { getBundleInfo } from '@/server/services/bundle';
 import { Container } from '@/components/ui/Container';
 import { CourseTabs } from '@/components/course/CourseTabs';
 import { ModuleCard } from '@/components/course/ModuleCard';
 import { ProgressCard } from '@/components/course/ProgressCard';
 import { InfoCard } from '@/components/course/InfoCard';
+import { BundleCard } from '@/components/course/BundleCard';
 
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
@@ -31,6 +33,17 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
   const isLoggedIn = !!session?.user;
 
   const modules = await getCourseModulesForStudent(userId, courseId);
+
+  // Oferta da formação completa (null = curso sem pacote configurado)
+  const bundleInfo = isLoggedIn
+    ? await getBundleInfo(session.user.id, courseId)
+    : await getBundleInfo(null, courseId);
+
+  const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  const minModulePriceCents = modules.reduce(
+    (min, m) => Math.min(min, m.priceCents),
+    Number.POSITIVE_INFINITY,
+  );
 
   const sobreContent = (
     <div className="space-y-8">
@@ -113,6 +126,12 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
                 <span>♾️ Acesso vitalício</span>
                 {course.hasCertificate && <span>🏆 Certificado de conclusão</span>}
               </div>
+              {bundleInfo && modules.length > 0 && (
+                <p className="mt-3 text-sm text-white/60">
+                  Módulos a partir de {brl.format(minModulePriceCents / 100)} · Curso completo{' '}
+                  {brl.format(bundleInfo.bundlePriceCents / 100)}
+                </p>
+              )}
             </div>
             {course.coverImageUrl && (
               <div className="hidden lg:block">
@@ -132,6 +151,11 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
       <Container className="py-10">
         <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
           <div>
+            {bundleInfo && (
+              <div className="mb-8">
+                <BundleCard courseId={courseId} info={bundleInfo} moduleCount={modules.length} />
+              </div>
+            )}
             <CourseTabs sobre={sobreContent} modulos={modulosContent} />
           </div>
 

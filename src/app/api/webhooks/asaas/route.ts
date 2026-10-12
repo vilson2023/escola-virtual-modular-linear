@@ -30,12 +30,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, ignored: true });
   }
 
-  const purchase = await prisma.studentPurchase.findFirst({
+  // Todas as compras que compartilham este externalId são atualizadas de uma
+  // vez (compra em bundle: 1 pagamento = N módulos, todos com o mesmo
+  // externalId no StudentPurchase).
+  const purchases = await prisma.studentPurchase.findMany({
     where: { externalId: payment.id },
     select: { id: true, statusPayment: true },
   });
 
-  if (!purchase) {
+  if (purchases.length === 0) {
     return NextResponse.json({ ok: true, ignored: true });
   }
 
@@ -58,12 +61,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, ignored: true });
   }
 
-  if (purchase.statusPayment === newStatus) {
+  const needsUpdate = purchases.some((p) => p.statusPayment !== newStatus);
+  if (!needsUpdate) {
     return NextResponse.json({ ok: true, unchanged: true });
   }
 
-  await prisma.studentPurchase.update({
-    where: { id: purchase.id },
+  await prisma.studentPurchase.updateMany({
+    where: { externalId: payment.id, statusPayment: { not: newStatus } },
     data: {
       statusPayment: newStatus,
       purchasedAt: newStatus === 'PAID' ? now : null,

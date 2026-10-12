@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/server/auth/session';
 import { canPurchaseModule } from '@/server/services/module-state';
-import { CheckoutForm } from './CheckoutForm';
+import { CheckoutForm } from '@/components/checkout/CheckoutForm';
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -31,10 +31,11 @@ export default async function CheckoutPage({
       </p>
 
       <CheckoutForm
+        mode="module"
         courseId={courseId}
         moduleId={moduleId}
         courseTitle={module.course.title}
-        moduleTitle={module.title}
+        itemTitle={module.title}
         priceFormatted={brl.format(module.priceCents / 100)}
       />
     </div>

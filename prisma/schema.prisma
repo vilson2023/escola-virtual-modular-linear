@@ -74,6 +74,9 @@ model Course {
   skills             String? // habilidades (separadas por vírgula)
   hasCertificate     Boolean  @default(true)
 
+  // Preço do pacote completo (todos os módulos) em centavos. null = pacote indisponível (M12c)
+  bundlePriceCents Int?
+
   modules      Module[]
   certificates Certificate[]
 

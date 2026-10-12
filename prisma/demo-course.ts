@@ -142,6 +142,8 @@ export async function createDemoCourse(prisma: PrismaClient): Promise<{
       skills:
         'Estratégia de conteúdo, Gestão de página comercial, Geração de leads, Processo de vendas',
       hasCertificate: true,
+      // Formação completa: R$ 159,90 (~30% de desconto sobre R$ 229,40) — M12c
+      bundlePriceCents: 15990,
     },
   });
 

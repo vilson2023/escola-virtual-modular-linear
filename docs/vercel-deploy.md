@@ -56,6 +56,8 @@ ADMIN_EMAIL=voce@dumo.com ADMIN_PASSWORD=SenhaForte123 DATABASE_URL=<neon-prod> 
 O script faz upsert: pode ser rodado de novo para **redefinir a senha** do admin (a senha antiga é substituída). Guarde a senha em local seguro — ela não é exibida novamente.
 
 > **Demo em produção:** para popular também o curso demo (1 curso com 6 módulos, útil para demonstrar a plataforma), adicione `SEED_DEMO_COURSE=true` ao comando. Remova essa env quando for publicar conteúdo de verdade.
+>
+> Desde o M12c, o `SEED_DEMO_COURSE=true` cria também o `bundlePriceCents` do curso demo (formação completa com desconto).
 
 ## Passo 5 — Atualizar `AUTH_URL` e `NEXT_PUBLIC_APP_URL`
 
