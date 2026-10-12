@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/server/auth/session';
 
-export async function markLessonCompleteAction(lessonId: string) {
+export async function markLessonCompleteAction(lessonId: string): Promise<{ error?: string }> {
   const user = await requireAuth();
 
   // Busca a aula e o módulo (para guard + revalidação)
@@ -16,7 +16,7 @@ export async function markLessonCompleteAction(lessonId: string) {
     },
   });
 
-  if (!lesson) throw new Error('Aula não encontrada');
+  if (!lesson) return { error: 'Aula não encontrada' };
 
   // Guard: o aluno precisa ter compra PAID do módulo
   const purchase = await prisma.studentPurchase.findFirst({
@@ -29,7 +29,7 @@ export async function markLessonCompleteAction(lessonId: string) {
   });
 
   if (!purchase) {
-    throw new Error('Você não tem acesso a este módulo');
+    return { error: 'Você não tem acesso a este módulo' };
   }
 
   // Upsert: cria ou atualiza o progresso
@@ -53,9 +53,11 @@ export async function markLessonCompleteAction(lessonId: string) {
   revalidatePath(`/courses/${courseId}/modules/${moduleId}`);
   revalidatePath(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`);
   revalidatePath('/dashboard');
+
+  return {};
 }
 
-export async function unmarkLessonCompleteAction(lessonId: string) {
+export async function unmarkLessonCompleteAction(lessonId: string): Promise<{ error?: string }> {
   const user = await requireAuth();
 
   const lesson = await prisma.lesson.findUnique({
@@ -66,7 +68,21 @@ export async function unmarkLessonCompleteAction(lessonId: string) {
     },
   });
 
-  if (!lesson) throw new Error('Aula não encontrada');
+  if (!lesson) return { error: 'Aula não encontrada' };
+
+  // Guard: só permite desmarcar quem tem o módulo comprado
+  const purchase = await prisma.studentPurchase.findFirst({
+    where: {
+      userId: user.id,
+      moduleId: lesson.moduleId,
+      statusPayment: 'PAID',
+    },
+    select: { id: true },
+  });
+
+  if (!purchase) {
+    return { error: 'Você não tem acesso a este módulo' };
+  }
 
   await prisma.studentProgress.updateMany({
     where: { userId: user.id, lessonId },
@@ -79,4 +95,6 @@ export async function unmarkLessonCompleteAction(lessonId: string) {
   revalidatePath(`/courses/${courseId}/modules/${moduleId}`);
   revalidatePath(`/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`);
   revalidatePath('/dashboard');
+
+  return {};
 }

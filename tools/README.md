@@ -27,6 +27,8 @@ Se der erro em algum passo, o script mostra a mensagem e espera você ler antes 
 ### check-env.bat
 
 Verifica se os arquivos `.env` e `.env.local` estão configurados corretamente.
+Também avisa (sem bloquear) se o `ASAAS_WEBHOOK_TOKEN` estiver ausente ou vazio —
+ele é necessário para o webhook do Asaas em produção.
 
 **Uso:** duplo clique. Um relatório aparece no terminal listando o que está OK e o que está faltando ou com formato errado.
 
@@ -169,6 +171,15 @@ O que ele faz:
 3. Regenera o Prisma Client
 
 Depois dele, volte a usar o `sync-and-run.bat` normalmente.
+
+## Armadilhas do cmd (para quem editar os scripts)
+
+Se você for mexer nos `.bat` desta pasta, leia primeiro
+[cmd-pitfalls.md](cmd-pitfalls.md). Lá estão documentadas as pegadinhas que
+já quebraram scripts aqui: parênteses/aspas literais em blocos `if`, o
+`for /f` quebrando com comandos complexos, LF vs CRLF, o `$` do
+dotenv-expand, o espaço do `echo texto > arquivo`, o `call` antes de
+`node`/`npm`, e o `prisma generate` que falha enquanto o servidor roda.
 
 ## Como parar o servidor
 

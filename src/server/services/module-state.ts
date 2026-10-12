@@ -120,10 +120,7 @@ export async function getCourseModulesForStudent(
 /**
  * Guard: pode o aluno acessar as aulas deste módulo?
  */
-export async function canAccessModule(
-  userId: string,
-  moduleId: string,
-): Promise<boolean> {
+export async function canAccessModule(userId: string, moduleId: string): Promise<boolean> {
   const purchase = await prisma.studentPurchase.findFirst({
     where: { userId, moduleId, statusPayment: 'PAID' },
     select: { id: true },
@@ -144,6 +141,14 @@ export async function canPurchaseModule(
   });
 
   if (!target) return { ok: false, reason: 'Módulo não encontrado' };
+
+  // Já desbloqueado (compra PAID) não pode ser comprado de novo:
+  // evita sobrescrever a compra existente e cobrança duplicada.
+  const existingPurchase = await prisma.studentPurchase.findFirst({
+    where: { userId, moduleId, statusPayment: 'PAID' },
+    select: { id: true },
+  });
+  if (existingPurchase) return { ok: false, reason: 'Módulo já desbloqueado' };
 
   const previousModules = await prisma.module.findMany({
     where: {

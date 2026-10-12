@@ -3,11 +3,11 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/server/auth/session';
 import { getCourseModulesForStudent } from '@/server/services/module-state';
-import { simulatePurchaseAction } from '@/server/actions/purchases';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Container } from '@/components/ui/Container';
+import { SimulatePurchaseButton } from '@/components/student/SimulatePurchaseButton';
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -52,9 +52,7 @@ export default async function CourseViewPage({
 
         <div className="mt-4">
           <h1 className="text-3xl font-bold text-slate-900">{course.title}</h1>
-          {course.description && (
-            <p className="mt-2 text-slate-500">{course.description}</p>
-          )}
+          {course.description && <p className="mt-2 text-slate-500">{course.description}</p>}
         </div>
 
         <div className="mt-8 space-y-6">
@@ -63,13 +61,11 @@ export default async function CourseViewPage({
 
             if (module.state === 'LIBERADO') {
               return (
-                <Card key={module.id} className="border-l-4 border-brand-500">
+                <Card key={module.id} className="border-brand-500 border-l-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-xl font-semibold text-slate-900">{module.title}</h2>
                     <Badge variant="success">Liberado</Badge>
-                    {module.progressPercent === 100 && (
-                      <Badge variant="brand">✓ Concluído</Badge>
-                    )}
+                    {module.progressPercent === 100 && <Badge variant="brand">✓ Concluído</Badge>}
                   </div>
                   {module.description && (
                     <p className="mt-1 text-sm text-slate-500">{module.description}</p>
@@ -79,7 +75,7 @@ export default async function CourseViewPage({
                   </p>
                   <div className="mt-2 h-1.5 w-full max-w-md overflow-hidden rounded-full bg-slate-200">
                     <div
-                      className="h-full rounded-full bg-brand-600"
+                      className="bg-brand-600 h-full rounded-full"
                       style={{ width: `${module.progressPercent}%` }}
                     />
                   </div>
@@ -94,7 +90,7 @@ export default async function CourseViewPage({
 
             if (module.state === 'VITRINE') {
               return (
-                <Card key={module.id} className="ring-2 ring-brand-200">
+                <Card key={module.id} className="ring-brand-200 ring-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-xl font-semibold text-slate-900">{module.title}</h2>
                     <Badge variant="brand">Disponível</Badge>
@@ -125,11 +121,7 @@ export default async function CourseViewPage({
                       Quero desbloquear por {brl.format(module.priceCents / 100)}
                     </Button>
                     {process.env.NODE_ENV !== 'production' && (
-                      <form action={simulatePurchaseAction.bind(null, module.id)}>
-                        <Button type="submit" variant="ghost" size="sm">
-                          [DEV] Simular compra
-                        </Button>
-                      </form>
+                      <SimulatePurchaseButton moduleId={module.id} />
                     )}
                   </div>
 

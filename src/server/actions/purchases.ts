@@ -5,17 +5,17 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/server/auth/session';
 import { canPurchaseModule } from '@/server/services/module-state';
 
-export async function simulatePurchaseAction(moduleId: string) {
+export async function simulatePurchaseAction(moduleId: string): Promise<{ error?: string }> {
   // Guard: só funciona em desenvolvimento
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('Esta ação é apenas para desenvolvimento');
+    return { error: 'Esta ação é apenas para desenvolvimento' };
   }
 
   const user = await requireAuth();
 
   const check = await canPurchaseModule(user.id, moduleId);
   if (!check.ok) {
-    throw new Error(check.reason);
+    return { error: check.reason };
   }
 
   // Descobre o courseId para revalidar
@@ -40,4 +40,6 @@ export async function simulatePurchaseAction(moduleId: string) {
     revalidatePath('/courses');
     revalidatePath(`/courses/${module.courseId}`);
   }
+
+  return {};
 }

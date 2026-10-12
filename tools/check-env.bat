@@ -89,5 +89,19 @@ if errorlevel 1 (
   echo   [OK] ASAAS_API_URL presente
 )
 
+:: Webhook: ausencia so gera aviso (nao bloqueia o servidor)
+powershell -Command "$c = Get-Content '%FILE%' | Where-Object { $_ -match '^ASAAS_WEBHOOK_TOKEN=' }; if ($c) { $v = $c -replace '^ASAAS_WEBHOOK_TOKEN='; $v = $v.Trim([char]34).Trim(); if ($v.Length -gt 0) { Write-Output 'presente' } else { Write-Output 'vazio' } } else { Write-Output 'ausente' }" > "%TEMP%\dumo-whk.txt" 2>nul
+set "WHK="
+if exist "%TEMP%\dumo-whk.txt" set /p WHK=<"%TEMP%\dumo-whk.txt"
+del /q "%TEMP%\dumo-whk.txt" >nul 2>&1
+
+if "%WHK%"=="presente" (
+  echo   [OK] ASAAS_WEBHOOK_TOKEN presente
+) else if "%WHK%"=="vazio" (
+  echo   [!] ASAAS_WEBHOOK_TOKEN vazio - necessario para webhook em producao
+) else (
+  echo   [!] ASAAS_WEBHOOK_TOKEN ausente - necessario para webhook em producao
+)
+
 echo.
 goto :eof
