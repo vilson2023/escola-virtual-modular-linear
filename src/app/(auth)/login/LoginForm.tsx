@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Logo } from '@/components/ui/Logo';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { NeonButton } from '@/components/ui/NeonButton';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 
@@ -44,21 +43,20 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <div className="mb-6 text-center">
-        <Logo href="/" />
-      </div>
-
-      <h1 className="text-2xl font-bold text-slate-900">Bem-vindo de volta</h1>
-      <p className="mt-1 text-sm text-slate-500">Entre para continuar sua jornada.</p>
+    <GlassCard hover={false} className="mx-auto w-full max-w-md">
+      <h1 className="text-2xl font-bold text-white">Bem-vindo de volta</h1>
+      <p className="mt-1 text-sm text-white/60">Entre para continuar sua jornada.</p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <Label htmlFor="email">E-mail</Label>
+          <Label htmlFor="email" variant="dark">
+            E-mail
+          </Label>
           <Input
             id="email"
             type="email"
             required
+            variant="dark"
             placeholder="voce@exemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -66,30 +64,37 @@ export function LoginForm() {
         </div>
 
         <div>
-          <Label htmlFor="password">Senha</Label>
+          <Label htmlFor="password" variant="dark">
+            Senha
+          </Label>
           <Input
             id="password"
             type="password"
             required
+            variant="dark"
             placeholder="Sua senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
-        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+        {error && (
+          <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+            {error}
+          </p>
+        )}
 
-        <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+        <NeonButton type="submit" variant="primary" className="w-full" disabled={loading}>
           {loading ? 'Entrando...' : 'Entrar'}
-        </Button>
+        </NeonButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-white/50">
         Ainda não tem conta?{' '}
-        <Link href="/register" className="text-brand-600 hover:text-brand-700 font-semibold">
+        <Link href="/register" className="text-gradient-brand font-semibold hover:brightness-125">
           Criar conta
         </Link>
       </p>
-    </Card>
+    </GlassCard>
   );
 }

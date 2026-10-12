@@ -1,11 +1,11 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
+import { NeonButton } from '@/components/ui/NeonButton';
 
 export function PrintCertificateButton() {
   return (
-    <Button type="button" variant="primary" onClick={() => window.print()}>
+    <NeonButton type="button" variant="accent" onClick={() => window.print()}>
       🖨️ Imprimir / Salvar como PDF
-    </Button>
+    </NeonButton>
   );
 }

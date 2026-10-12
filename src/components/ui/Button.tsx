@@ -14,7 +14,7 @@ type Props = {
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700',
+  primary: 'bg-brand-600 text-white shadow-sm hover:bg-brand-700 hover:shadow-md',
   secondary: 'border border-slate-300 text-slate-700 hover:bg-slate-50',
   ghost: 'text-slate-600 hover:bg-slate-100',
   danger: 'bg-red-600 text-white hover:bg-red-700',
@@ -34,7 +34,7 @@ export function Button({
   children,
   ...rest
 }: Props) {
-  const classes = `inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = `inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`;
 
   if (href) {
     return (

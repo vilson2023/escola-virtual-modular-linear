@@ -52,7 +52,9 @@ export default async function DashboardPage() {
       </header>
 
       <Container className="py-8 sm:py-12">
-        <h1 className="text-3xl font-bold text-slate-900">Olá, {user.name} 👋</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+          Olá, {user.name} 👋
+        </h1>
         <p className="mt-2 text-slate-500">Continue de onde parou.</p>
 
         <div className="mt-8 space-y-6">
@@ -63,7 +65,12 @@ export default async function DashboardPage() {
                 Gerencie cursos, módulos e alunos no painel administrativo.
               </p>
               <div className="mt-4">
-                <Button href="/admin" variant="primary" size="sm">
+                <Button
+                  href="/admin"
+                  variant="primary"
+                  size="sm"
+                  className="from-brand-600 to-brand-500 bg-gradient-to-r"
+                >
                   Ir para o Painel Admin →
                 </Button>
               </div>

@@ -150,7 +150,7 @@ export default async function CourseViewPage({
                   </div>
 
                   {module.presentationVideoUrl && (
-                    <div className="mt-4 aspect-video w-full overflow-hidden rounded-lg">
+                    <div className="ring-brand-500/40 shadow-glow-brand mt-4 aspect-video w-full overflow-hidden rounded-xl ring-2">
                       <iframe
                         src={module.presentationVideoUrl}
                         title={`Apresentação: ${module.title}`}
@@ -170,7 +170,7 @@ export default async function CourseViewPage({
                       href={`/courses/${courseId}/checkout/${module.id}`}
                       variant="primary"
                       size="lg"
-                      className="w-full sm:w-auto"
+                      className="from-brand-600 to-brand-500 w-full bg-gradient-to-r shadow-md sm:w-auto"
                     >
                       Quero desbloquear por {brl.format(module.priceCents / 100)}
                     </Button>

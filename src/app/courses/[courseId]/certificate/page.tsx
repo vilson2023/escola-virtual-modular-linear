@@ -3,7 +3,8 @@ import { requireAuth } from '@/server/auth/session';
 import { getOrCreateCertificate } from '@/server/services/certificate';
 import { prisma } from '@/lib/prisma';
 import { Logo } from '@/components/ui/Logo';
-import { Button } from '@/components/ui/Button';
+import { NeonButton } from '@/components/ui/NeonButton';
+import { GradientText } from '@/components/ui/GradientText';
 import { Container } from '@/components/ui/Container';
 import { PrintCertificateButton } from '@/components/student/PrintCertificateButton';
 
@@ -40,13 +41,13 @@ export default async function CertificatePage({
   });
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white print:hidden">
+    <div className="bg-night-gradient print-dark-page min-h-screen text-white">
+      <header className="bg-night-950/60 border-b border-white/5 backdrop-blur-xl print:hidden">
         <Container className="flex h-16 items-center justify-between">
-          <Logo href="/" />
-          <Button href={`/courses/${courseId}`} variant="ghost" size="sm">
+          <Logo href="/" variant="light" />
+          <NeonButton href={`/courses/${courseId}`} variant="ghost" size="sm">
             ← Voltar ao curso
-          </Button>
+          </NeonButton>
         </Container>
       </header>
 
@@ -55,28 +56,29 @@ export default async function CertificatePage({
           {/* Certificado */}
           <div
             id="certificate"
-            className="border-brand-500 shadow-card rounded-2xl border-4 border-double bg-white px-4 py-10 text-center sm:px-14 sm:py-14"
+            className="print-dark-card glass shadow-glow-brand relative rounded-2xl border-4 border-double border-amber-400/40 px-4 py-10 text-center sm:px-14 sm:py-14"
           >
-            <p className="text-brand-600 text-sm font-semibold tracking-[0.3em] uppercase">dumo</p>
-            <h1 className="mt-6 font-serif text-3xl font-bold text-slate-900 sm:text-5xl">
+            <p className="text-accent-300 text-sm font-semibold tracking-[0.3em] uppercase">dumo</p>
+            <h1 className="mt-6 font-serif text-3xl font-bold text-white sm:text-5xl">
               Certificado
             </h1>
-            <div className="bg-brand-400 mx-auto mt-6 h-px w-24" />
-            <p className="mt-8 text-slate-500">Certificamos que</p>
-            <p className="mt-2 text-xl font-bold text-slate-900 sm:text-3xl">{user.name}</p>
-            <p className="mx-auto mt-6 max-w-xl text-slate-600">
+            <div className="bg-gradient-brand mx-auto mt-6 h-px w-24" />
+            <p className="mt-8 text-white/50">Certificamos que</p>
+            <p className="mt-2 text-xl font-bold sm:text-3xl">
+              <GradientText>{user.name}</GradientText>
+            </p>
+            <p className="mx-auto mt-6 max-w-xl text-white/70">
               concluiu com êxito o curso{' '}
-              <span className="font-semibold text-slate-900">{course.title}</span> na plataforma
-              dumo.
+              <span className="font-semibold text-white">{course.title}</span> na plataforma dumo.
             </p>
             <div className="mx-auto mt-10 flex max-w-md items-center justify-between gap-8 text-left">
               <div>
-                <p className="text-xs tracking-wider text-slate-400 uppercase">Emitido em</p>
-                <p className="mt-1 text-sm font-medium text-slate-700">{issuedAt}</p>
+                <p className="text-xs tracking-wider text-white/40 uppercase">Emitido em</p>
+                <p className="mt-1 text-sm font-medium text-white/80">{issuedAt}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs tracking-wider text-slate-400 uppercase">Código</p>
-                <p className="text-brand-700 mt-1 font-mono text-sm font-semibold">
+                <p className="text-xs tracking-wider text-white/40 uppercase">Código</p>
+                <p className="text-accent-300 mt-1 font-mono text-sm font-semibold">
                   {certificate.code}
                 </p>
               </div>
